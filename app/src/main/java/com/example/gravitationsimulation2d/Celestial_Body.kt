@@ -1,0 +1,96 @@
+package com.example.gravitationsimulation2d
+
+import androidx.annotation.DrawableRes
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import kotlin.math.floor
+import kotlin.math.log10
+import kotlin.math.pow
+
+const val G: Double = 6.674E-11                     // gravitational constant (N.m^2/kg^2)
+const val DELTA_T: Double = 365.0*24.0*60.0         // unit time (The force is constant for DELTA_T time)
+const val SCALE: Double = 1.0E9                     // m/dp
+var nextPlanetId: Long = 0
+
+class CelestialBody(
+    xArg: Double,              // density pixel (dp)
+    yArg: Double,              // density pixel (dp)
+    xVelocityArg: Double,      // km/s (+ for right, - for left)
+    yVelocityArg: Double,      // km/s (+ for down, - for up)
+    massCoefArg: Double,
+    massPowerArg: Double,
+    @DrawableRes imageIdArg: Int,
+    var id: Long
+) {
+    var x by mutableStateOf(xArg)                                      // dp
+    var y by mutableStateOf(yArg)                                      // dp
+    var xVelocity by mutableStateOf(xVelocityArg)                      // km/s
+    var yVelocity by mutableStateOf(yVelocityArg)                      // km/s
+    var massCoef by mutableStateOf(massCoefArg)
+    var massPower by mutableStateOf(massPowerArg)
+    var imageId by mutableStateOf(imageIdArg)
+    var mass by mutableStateOf(massCoef * 10.0.pow(massPower))    // kg
+    var selected: Boolean = false
+    val radius: Int = 12
+
+    /*
+    Returns distance in terms of m
+     */
+    private fun distance(other: CelestialBody): Double {
+        val xDiff = this.x-other.x
+        val yDiff = this.y-other.y
+        return (xDiff*xDiff + yDiff*yDiff).pow(0.5) * SCALE
+    }
+
+    /*
+    Updates the coordinates of the celestial body
+     */
+    fun move() {
+        this.x += this.xVelocity * 1000.0 * DELTA_T / SCALE      // dp
+        this.y += this.yVelocity * 1000.0 * DELTA_T / SCALE      // dp
+    }
+
+    /*
+    Returns true if the distance between centers of two celestial bodies is less than the sum of radius
+     */
+    fun overlapsWith(other: CelestialBody): Boolean {
+        return distance(other)/SCALE < this.radius+other.radius
+    }
+
+    /*
+    Applies force to another celestial body and changes its velocity
+     */
+    fun applyForce(other: CelestialBody) {
+        val dist = this.distance(other)                             // m
+        val force = G * this.mass * other.mass / (dist*dist)        // Newton
+        val forceX = force * SCALE * (this.x - other.x) / dist      // Newton
+        val forceY = force * SCALE * (this.y - other.y) / dist      // Newton
+        other.xVelocity += forceX * DELTA_T / other.mass / 1000.0   // km/s
+        other.yVelocity += forceY * DELTA_T / other.mass / 1000.0   // km/s
+    }
+
+    /*
+    Returns a copy of the same celestial body
+     */
+    fun copy(): CelestialBody {
+        return CelestialBody(x, y, xVelocity, yVelocity, massCoef, massPower, imageId, nextPlanetId++)
+    }
+
+    /*
+    Collides with another lighter celestial body and consumes it
+     */
+    fun collide(other: CelestialBody) {
+        this.xVelocity = (this.xVelocity*this.mass + other.xVelocity*other.mass) / this.mass
+        this.yVelocity = (this.yVelocity*this.mass + other.yVelocity*other.mass) / this.mass
+        this.mass += other.mass
+        this.massPower = floor(log10(this.mass))
+        this.massCoef = this.mass / 10.0.pow(this.massPower)
+    }
+}
+
+val CelestialBody.xOffset: Dp get() = x.toInt().dp - (radius.dp / 2)
+val CelestialBody.yOffset: Dp get() = y.toInt().dp - (radius.dp / 2)
+

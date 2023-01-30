@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Gravitation Simulation 2D</string>
+    <string name="add">Add a Planet</string>
+    <string name="delete">Delete a Planet</string>
+    <string name="change">Change a Planet</string>
+    <string name="run">Run the Simulation</string>
+    <string name="x_settingText">X:</string>
+    <string name="y_settingText">Y:</string>
+    <string name="x_velocity_settingText">X Vel:</string>
+    <string name="y_velocity_settingText">Y Vel:</string>
+    <string name="mass_coef_settingText">Mass Coef:</string>
+    <string name="mass_power_settingText">Mass Pow: 10^</string>
+    <string name="dp_settingText">dp</string>
+    <string name="km_div_s_settingText">km/s</string>
+    <string name="kg_settingText">kg</string>
+    <string name="empty_string"> </string>
+    <string name="play_pause">Play-Pause</string>
+    <string name="restart">Restart</string>
+    <string name="back_to_initialisation">Back to the Initialisation</string>
+</resources>
