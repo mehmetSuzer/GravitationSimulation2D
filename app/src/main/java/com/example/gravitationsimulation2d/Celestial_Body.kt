@@ -9,7 +9,6 @@ import kotlin.math.log10
 import kotlin.math.pow
 
 const val G: Double = 6.674E-11                     // gravitational constant (N.m^2/kg^2)
-const val DELTA_T: Double = 365.0*24.0*60.0         // unit time (The force is constant for DELTA_T time)
 const val SCALE: Double = 1.0E9                     // m/dp
 var nextPlanetId: Long = 0
 
@@ -56,9 +55,9 @@ class CelestialBody(
     /*
     Updates the coordinates of the celestial body
      */
-    fun move() {
-        x += xVelocity * 1000.0 * DELTA_T / SCALE      // dp
-        y += yVelocity * 1000.0 * DELTA_T / SCALE      // dp
+    fun move(deltaT: Double) {
+        x += xVelocity * 1000.0 * deltaT / SCALE      // dp
+        y += yVelocity * 1000.0 * deltaT / SCALE      // dp
         if (selected) {
             orbit[orbitIndex] = OrbitDot(x.toInt()+radius/2, y.toInt()+radius/2)
             orbitIndex = (orbitIndex+1) % ORBIT_SIZE
@@ -75,13 +74,13 @@ class CelestialBody(
     /*
     Applies force to another celestial body and changes its velocity
      */
-    fun applyForce(other: CelestialBody) {
+    fun applyForce(other: CelestialBody, deltaT: Double) {
         val dist = this.distance(other)                             // m
         val force = G * this.mass * other.mass / (dist*dist)        // Newton
         val forceX = force * SCALE * (this.x - other.x) / dist      // Newton
         val forceY = force * SCALE * (this.y - other.y) / dist      // Newton
-        other.xVelocity += forceX * DELTA_T / other.mass / 1000.0   // km/s
-        other.yVelocity += forceY * DELTA_T / other.mass / 1000.0   // km/s
+        other.xVelocity += forceX * deltaT / other.mass / 1000.0   // km/s
+        other.yVelocity += forceY * deltaT / other.mass / 1000.0   // km/s
     }
 
     /*

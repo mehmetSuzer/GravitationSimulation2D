@@ -8,29 +8,30 @@ enum class SimulationState {
     STOPPED, RUNNING
 }
 
+const val DELTA_TIME_MULTIPLIER = 0.042048
+
 class Simulation(var planets: MutableList<CelestialBody>) {
     private var prevTime: Long = 0L
     private var state by mutableStateOf(SimulationState.STOPPED)
 
-    private fun applyForceToAll() {
+    private fun applyForceToAll(deltaT: Double) {
         val size: Int = planets.size
         for (i in 0 until size-1) {
             for (j in i+1 until size) {
-                planets[i].applyForce(planets[j])
-                planets[j].applyForce(planets[i])
+                planets[i].applyForce(planets[j], deltaT)
+                planets[j].applyForce(planets[i], deltaT)
             }
         }
     }
 
     fun update(time: Long) {
-        val delta: Long = time -prevTime
-        val deltaT: Double = (delta/1E8) // use it for screen-independent results
+        val deltaT: Double =DELTA_TIME_MULTIPLIER*(time-prevTime)
         prevTime = time
 
         if (state == SimulationState.STOPPED) return
-        applyForceToAll()
+        applyForceToAll(deltaT)
         for (planet in planets) {
-            planet.move()
+            planet.move(deltaT)
         }
         handleCollusion()
     }
@@ -62,3 +63,4 @@ class Simulation(var planets: MutableList<CelestialBody>) {
         }
     }
 }
+
