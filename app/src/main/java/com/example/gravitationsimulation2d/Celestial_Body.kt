@@ -4,8 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -35,7 +33,17 @@ class CelestialBody(
     var mass by mutableStateOf(massCoef * 10.0.pow(massPower))    // kg
     var selected: Boolean = false
     val radius: Int = 12
+    val orbit = arrayOfNulls<OrbitDot>(ORBIT_SIZE)
+    private var orbitIndex: Int = 0
 
+    /*
+    Returns true if the point is in the celestial body
+     */
+    fun containsPoint(x: Double, y: Double): Boolean {
+        val xDiff = this.x-x
+        val yDiff = this.y-y
+        return (xDiff*xDiff + yDiff*yDiff).pow(0.5) < 2*this.radius
+    }
     /*
     Returns distance in terms of m
      */
@@ -49,15 +57,19 @@ class CelestialBody(
     Updates the coordinates of the celestial body
      */
     fun move() {
-        this.x += this.xVelocity * 1000.0 * DELTA_T / SCALE      // dp
-        this.y += this.yVelocity * 1000.0 * DELTA_T / SCALE      // dp
+        x += xVelocity * 1000.0 * DELTA_T / SCALE      // dp
+        y += yVelocity * 1000.0 * DELTA_T / SCALE      // dp
+        if (selected) {
+            orbit[orbitIndex] = OrbitDot(x.toInt()+radius/2, y.toInt()+radius/2)
+            orbitIndex = (orbitIndex+1) % ORBIT_SIZE
+        }
     }
 
     /*
-    Returns true if the distance between centers of two celestial bodies is less than the sum of radius
+    Returns true if the distance between centers of two different celestial bodies is less than the sum of radius
      */
     fun overlapsWith(other: CelestialBody): Boolean {
-        return distance(other)/SCALE < this.radius+other.radius
+        return this.id != other.id && distance(other)/SCALE < this.radius+other.radius
     }
 
     /*
@@ -89,8 +101,20 @@ class CelestialBody(
         this.massPower = floor(log10(this.mass))
         this.massCoef = this.mass / 10.0.pow(this.massPower)
     }
+
+    /*
+    Sets the selected field to the given boolean
+    If the celestial body is no longer selected, the orbit is cleared
+     */
+    fun set_selected(bool: Boolean) {
+        selected = bool
+        if (!selected) {
+            orbit.fill(null)
+            orbitIndex = 0
+        }
+    }
 }
 
-val CelestialBody.xOffset: Dp get() = x.toInt().dp - (radius.dp / 2)
-val CelestialBody.yOffset: Dp get() = y.toInt().dp - (radius.dp / 2)
+val CelestialBody.xOffset: Int get() = x.toInt()-radius/2
+val CelestialBody.yOffset: Int get() = y.toInt()-radius/2
 

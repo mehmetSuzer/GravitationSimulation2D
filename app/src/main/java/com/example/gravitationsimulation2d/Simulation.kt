@@ -36,8 +36,7 @@ class Simulation(var planets: MutableList<CelestialBody>) {
     }
 
     fun changeState() {
-        state = if (state == SimulationState.RUNNING) SimulationState.STOPPED
-                else SimulationState.RUNNING
+        state = if (state == SimulationState.RUNNING) SimulationState.STOPPED else SimulationState.RUNNING
     }
 
     fun stop() {

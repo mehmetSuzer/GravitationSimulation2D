@@ -43,10 +43,7 @@ TODO LIST
 when the screen is rotated, planets disappear
 colors of the app bar and the status bar must be same
 enumeration of planets in the simulation screen
-2 planet can be placed to the same position if one of them is modified later
-
 Remove unnecessary parts
-Add orbit dots
  */
 
 const val CELESTIAL_BODY_INIT_SCREEN: Int = 0
@@ -256,9 +253,9 @@ fun DrawInitialisedPlanetList(planets: MutableList<CelestialBody>, current_scree
                     if (current_screen == CELESTIAL_BODY_INIT_SCREEN) {
                         val prevSelected = celestial_body.selected
                         unselectAllPlanets(planets)
-                        celestial_body.selected = !prevSelected
+                        celestial_body.set_selected(!prevSelected)
                     } else if (current_screen == SIMULATION_SCREEN) {
-                        celestial_body.selected = !celestial_body.selected
+                        celestial_body.set_selected(!celestial_body.selected)
                     }
                     informUp()
                 }
@@ -397,11 +394,24 @@ fun CelestialBodySettingText(settingText: SettingText, state: Boolean, onChange:
 }
 
 @Composable
-fun DrawCelestialBody(planet: CelestialBody) {
+fun DrawCelestialBody(planet: CelestialBody, modifier: Modifier = Modifier) {
     val planetSize = (planet.radius*2).dp
+    if (planet.selected) {
+        for (dot in planet.orbit) {
+            if (dot != null) {
+                Box(
+                    modifier = Modifier
+                        .offset(dot.x.dp, dot.y.dp)
+                        .clip(CircleShape)
+                        .size(ORBIT_DOT_SIZE.dp)
+                        .background(MaterialTheme.colors.onBackground)
+                )
+            }
+        }
+    }
     Box(
-        modifier = Modifier
-            .offset(planet.xOffset, planet.yOffset)
+        modifier = modifier
+            .offset(planet.xOffset.dp, planet.yOffset.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colors.background)
     ) {
@@ -445,7 +455,7 @@ private fun addPlanetToList(planets: MutableList<CelestialBody>) {
         val massCoef: Double = userInputs[4].toDouble()
         val massPower: Double = userInputs[5].toDouble()
         val imageId: Int = data_source.getSelectedImageId()
-        if (!planets.any { planet -> planet.x == x && planet.y == y }) {
+        if (!planets.any { planet -> planet.containsPoint(x,y) }) {
             planets.add(CelestialBody(x, y, xVelocity, yVelocity, massCoef, massPower, imageId, nextPlanetId++))
         }
     }
@@ -457,7 +467,7 @@ private fun deletePlanetFromList(planets: MutableList<CelestialBody>) {
 
 private fun unselectAllPlanets(planets: MutableList<CelestialBody>) {
     for (planet in planets) {
-        planet.selected = false
+        planet.set_selected(false)
     }
 }
 
@@ -471,19 +481,20 @@ private fun getSelectedInitialisedPlanet(planets: MutableList<CelestialBody>): C
 
 private fun changeValuesOf(planets: MutableList<CelestialBody>) {
     val selectedPlanet: CelestialBody? = getSelectedInitialisedPlanet(planets)
-    if (selectedPlanet != null &&
-        data_source.inputsAreValid() &&
-        !planets.any { planet -> planet.id != selectedPlanet.id && planet.x == selectedPlanet.x && planet.y == selectedPlanet.y }
-    ) {
+    if (selectedPlanet != null && data_source.inputsAreValid()) {
         val userInputs = data_source.getUserInputs()
-        selectedPlanet.x = userInputs[0].toDouble()
-        selectedPlanet.y = userInputs[1].toDouble()
-        selectedPlanet.xVelocity = userInputs[2].toDouble()
-        selectedPlanet.yVelocity = userInputs[3].toDouble()
-        selectedPlanet.massCoef = userInputs[4].toDouble()
-        selectedPlanet.massPower = userInputs[5].toDouble()
-        selectedPlanet.mass = selectedPlanet.massCoef * 10.0.pow(selectedPlanet.massPower)
-        selectedPlanet.imageId = data_source.getSelectedImageId()
+        val x = userInputs[0].toDouble()
+        val y = userInputs[1].toDouble()
+        if (!planets.any { planet -> planet.id != selectedPlanet.id && planet.containsPoint(x,y) }) {
+            selectedPlanet.x = x
+            selectedPlanet.y = y
+            selectedPlanet.xVelocity = userInputs[2].toDouble()
+            selectedPlanet.yVelocity = userInputs[3].toDouble()
+            selectedPlanet.massCoef = userInputs[4].toDouble()
+            selectedPlanet.massPower = userInputs[5].toDouble()
+            selectedPlanet.mass = selectedPlanet.massCoef * 10.0.pow(selectedPlanet.massPower)
+            selectedPlanet.imageId = data_source.getSelectedImageId()
+        }
     }
 }
 
