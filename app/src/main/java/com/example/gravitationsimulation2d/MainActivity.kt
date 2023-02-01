@@ -1,6 +1,7 @@
 package com.example.gravitationsimulation2d
 
 import android.annotation.SuppressLint
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -43,6 +44,7 @@ TODO LIST
 when the screen is rotated, planets disappear
 colors of the app bar and the status bar must be same
 enumeration of planets in the simulation screen
+
 Remove unnecessary parts
  */
 
@@ -51,14 +53,37 @@ const val SIMULATION_SCREEN: Int = 1
 
 val data_source: Datasource = Datasource()
 val borderColor = Color(red = 105, green = 205, blue = 216)
+var mp: MediaPlayer? = null
+var audioWasPlaying = false
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        audioWasPlaying = false
+        mp = MediaPlayer.create(this, R.raw.interstellar_main_theme)
+        if (mp != null) {
+            mp!!.isLooping = true
+            mp!!.start()
+        }
         setContent {
             GravitationSimulation2DTheme {
                 GravitationSimulation2DApp()
             }
+        }
+    }
+
+    override fun onPause() {        // User no longer interacts with the app, but the app is visible
+        super.onPause()
+        if (mp != null) {
+            audioWasPlaying = mp!!.isPlaying
+            mp!!.pause()
+        }
+    }
+
+    override fun onResume() {       // The user starts interacting with the app
+        super.onResume()
+        if (mp != null && audioWasPlaying) {
+            mp!!.start()
         }
     }
 }
@@ -83,16 +108,23 @@ fun GravitationSimulation2DApp() {
         Scaffold(
             topBar = {
                 AppTopBarInitScreen(
-                    { addPlanetToList(planets) },                       // add planet button
-                    { deletePlanetFromList(planets)                     // delete planet button
+                    {
+                        addPlanetToList(planets)                          // add planet button
+                    },
+                    { deletePlanetFromList(planets)                       // delete planet button
                         data_source.nullAllPrevInputs()
                         selectedPlanetChange = !selectedPlanetChange
                     },
                     {
-                        changeValuesOf(planets)                         // change planet button
+                        changeValuesOf(planets)                           // change planet button
                         val planet: CelestialBody? = getSelectedInitialisedPlanet(planets)
                         data_source.updateSettingTextsPrevInputs(planet)
                         selectedPlanetChange = !selectedPlanetChange
+                    },
+                    {
+                        if (mp != null) {                                  // audio button
+                            if (mp!!.isPlaying) mp!!.pause() else mp!!.start()
+                        }
                     },
                     {
                         currentScreen = SIMULATION_SCREEN                 // run simulation button
@@ -141,7 +173,10 @@ fun GravitationSimulation2DApp() {
 }
 
 @Composable
-fun AppTopBarInitScreen(addPlanet: () -> Unit, deletePlanet: () -> Unit, changePlanet: () -> Unit, runSimulation: () -> Unit ,modifier: Modifier = Modifier) {
+fun AppTopBarInitScreen(addPlanet: () -> Unit, deletePlanet: () -> Unit, changePlanet: () -> Unit, handleAudio: () -> Unit, runSimulation: () -> Unit, modifier: Modifier = Modifier) {
+    var audioIsPlaying by rememberSaveable {
+        mutableStateOf(if (mp != null) mp!!.isPlaying else false)
+    }
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -174,6 +209,14 @@ fun AppTopBarInitScreen(addPlanet: () -> Unit, deletePlanet: () -> Unit, changeP
                 imageVector = Icons.Filled.ChangeCircle,
                 tint = MaterialTheme.colors.secondary,
                 contentDescription = stringResource(R.string.change),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        IconButton(onClick = { handleAudio(); audioIsPlaying = !audioIsPlaying }) {
+            Icon(
+                imageVector = if (audioIsPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
+                tint = MaterialTheme.colors.secondary,
+                contentDescription = stringResource(R.string.sound_on_off),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -501,16 +544,9 @@ private fun changeValuesOf(planets: MutableList<CelestialBody>) {
 @Preview
 @Composable
 fun AppPreview() {
-    GravitationSimulation2DTheme(darkTheme = false) {
+    GravitationSimulation2DTheme(darkTheme = isSystemInDarkTheme()) {
         GravitationSimulation2DApp()
     }
 }
 
-@Preview
-@Composable
-fun AppDarkThemePreview() {
-    GravitationSimulation2DTheme(darkTheme = true) {
-        GravitationSimulation2DApp()
-    }
-}
 
