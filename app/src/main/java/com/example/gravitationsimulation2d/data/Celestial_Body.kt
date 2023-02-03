@@ -8,8 +8,8 @@ import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
 
-const val G: Double = 6.674E-11                     // gravitational constant (N.m^2/kg^2)
-const val SCALE: Double = 1.0E9                     // m/dp
+const val G: Double = 6.674E-11     // gravitational constant (N.m^2/kg^2)
+const val SCALE: Double = 1.0E9     // m/dp
 var nextPlanetId: Long = 0
 
 class CelestialBody(

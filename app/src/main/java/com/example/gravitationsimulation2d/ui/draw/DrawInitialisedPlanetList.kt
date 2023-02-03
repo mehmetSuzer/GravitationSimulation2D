@@ -26,7 +26,13 @@ import com.example.gravitationsimulation2d.func.unselectAllPlanets
 
 
 @Composable
-fun DrawInitialisedPlanetList(planets: MutableList<CelestialBody>, current_screen: Screen, planetBackGroundColor: Color, informUp: () -> Unit, modifier: Modifier = Modifier) {
+fun DrawInitialisedPlanetList(
+    planets: MutableList<CelestialBody>,
+    current_screen: Screen,
+    planetBackGroundColor: Color,
+    informUp: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var state by rememberSaveable {
         mutableStateOf(false)
     }
@@ -64,7 +70,13 @@ fun DrawInitialisedPlanetList(planets: MutableList<CelestialBody>, current_scree
 }
 
 @Composable
-fun DrawInitialisedPlanetImage(celestial_body: CelestialBody, backgroundColor: Color, state: Boolean, onChange: () -> Unit, modifier: Modifier = Modifier) {
+fun DrawInitialisedPlanetImage(
+    celestial_body: CelestialBody,
+    backgroundColor: Color,
+    state: Boolean,
+    onChange: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Image(
         painter = painterResource(id = celestial_body.imageId),
         contentDescription = null,

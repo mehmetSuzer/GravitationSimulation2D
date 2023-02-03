@@ -58,3 +58,31 @@ fun changeValuesOf(planets: MutableList<CelestialBody>) {
         }
     }
 }
+
+fun convertPlanetsToSimulationRecord(planets: MutableList<CelestialBody>): String {
+    var result = ""
+    for (index in 0 until planets.size) {
+        val planet = planets[index]
+        val planetStat = "${planet.x},${planet.y},${planet.xVelocity},${planet.yVelocity},${planet.massCoef},${planet.massPower},${planet.imageId}"
+        result += if (index == planets.size-1) planetStat else "${planetStat};"
+    }
+    return result
+}
+
+fun convertSimulationRecordToPlanets(record: String): MutableList<CelestialBody> {
+    val result = mutableListOf<CelestialBody>()
+    val planetStats = record.split(';')
+    for (planetStat in planetStats) {
+        val values = planetStat.split(',')
+        val x = values[0].toDouble()
+        val y = values[1].toDouble()
+        val xVelocity = values[2].toDouble()
+        val yVelocity = values[3].toDouble()
+        val massCoef = values[4].toDouble()
+        val massPower = values[5].toDouble()
+        val imageId = values[6].toInt()
+        val planet = CelestialBody(x, y, xVelocity, yVelocity, massCoef, massPower, imageId, nextPlanetId++)
+        result.add(planet)
+    }
+    return result
+}

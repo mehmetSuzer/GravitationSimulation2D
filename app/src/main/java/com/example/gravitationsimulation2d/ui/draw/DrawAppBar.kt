@@ -25,7 +25,14 @@ import com.example.gravitationsimulation2d.mp
 
 
 @Composable
-fun AppTopBarInitScreen(addPlanet: () -> Unit, deletePlanet: () -> Unit, changePlanet: () -> Unit, handleAudio: () -> Unit, runSimulation: () -> Unit, modifier: Modifier = Modifier) {
+fun AppTopBarInitScreen(
+    addPlanet: () -> Unit,
+    deletePlanet: () -> Unit,
+    changePlanet: () -> Unit,
+    handleAudio: () -> Unit,
+    runSimulation: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var audioIsPlaying by rememberSaveable {
         mutableStateOf(if (mp != null) mp!!.isPlaying else false)
     }
@@ -85,7 +92,14 @@ fun AppTopBarInitScreen(addPlanet: () -> Unit, deletePlanet: () -> Unit, changeP
 }
 
 @Composable
-fun AppTopBarSimulationScreen(planets: MutableList<CelestialBody>, backToInitialisation: () -> Unit, onPlayPauseClick: () -> Unit, onRestartClick: () -> Unit, current_screen: Screen, modifier: Modifier = Modifier) {
+fun AppTopBarSimulationScreen(
+    planets: MutableList<CelestialBody>,
+    backToInitialisation: () -> Unit,
+    onPlayPauseClick: () -> Unit,
+    onRestartClick: () -> Unit,
+    current_screen: Screen,
+    modifier: Modifier = Modifier
+) {
     var playing by rememberSaveable {
         mutableStateOf(false)
     }

@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -17,8 +18,14 @@ import com.example.gravitationsimulation2d.data.CelestialBody
 import com.example.gravitationsimulation2d.data.Datasource
 import com.example.gravitationsimulation2d.data.Simulation
 import com.example.gravitationsimulation2d.func.*
+import com.example.gravitationsimulation2d.model.SimulationRecord
 import com.example.gravitationsimulation2d.ui.draw.*
 import com.example.gravitationsimulation2d.ui.theme.GravitationSimulation2DTheme
+import com.example.gravitationsimulation2d.viewmodel.HomeViewModel
+import com.example.gravitationsimulation2d.viewmodel.HomeViewModelAbstract
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 /*
 State in Jetpack Composable
@@ -42,9 +49,11 @@ val borderColor = Color(red = 105, green = 205, blue = 216)
 var mp: MediaPlayer? = null
 var audioWasPlaying = false
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val homeViewModel: HomeViewModel by viewModels()
         audioWasPlaying = false
         mp = MediaPlayer.create(this, R.raw.interstellar_main_theme)
         if (mp != null) {
@@ -53,7 +62,9 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             GravitationSimulation2DTheme {
-                GravitationSimulation2DApp()
+                GravitationSimulation2DApp(
+                    homeViewModel = homeViewModel
+                )
             }
         }
     }
@@ -74,7 +85,10 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun GravitationSimulation2DApp() {
+fun GravitationSimulation2DApp(
+    homeViewModel: HomeViewModelAbstract
+) {
+    val recordListState = homeViewModel.simulationRecordFlow.collectAsState(initial = listOf())
     var currentScreen by rememberSaveable {
         mutableStateOf(Screen.Init)
     }
@@ -160,7 +174,14 @@ fun GravitationSimulation2DApp() {
 @Composable
 fun AppPreview() {
     GravitationSimulation2DTheme(darkTheme = isSystemInDarkTheme()) {
-        GravitationSimulation2DApp()
+        GravitationSimulation2DApp(
+            homeViewModel = object : HomeViewModelAbstract {
+                override val simulationRecordFlow: Flow<List<SimulationRecord>> get() = flowOf(listOf())
+                override fun addRecord(record: SimulationRecord) {}
+                override fun updateRecord(record: SimulationRecord) {}
+                override fun deleteRecord(record: SimulationRecord) {}
+            }
+        )
     }
 }
 
