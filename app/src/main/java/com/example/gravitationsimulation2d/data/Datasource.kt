@@ -32,7 +32,7 @@ class Datasource {
 
 
     private var settingTexts = listOf(
-        SettingText(R.string.x_settingText, R.string.dp_settingText ,"200.0", "$xLowLimit≤...≤$xHighLimit"),
+        SettingText(R.string.x_settingText, R.string.dp_settingText ,"340.0", "$xLowLimit≤...≤$xHighLimit"),
         SettingText(R.string.y_settingText, R.string.dp_settingText, "200.0", "$yLowLimit≤...≤$yHighLimit"),
         SettingText(R.string.x_velocity_settingText, R.string.km_div_s_settingText, "0.0", "$xVelocityLowLimit≤...≤$xVelocityHighLimit"),
         SettingText(R.string.y_velocity_settingText, R.string.km_div_s_settingText, "30.0", "$yVelocityLowLimit≤...≤$yVelocityHighLimit"),
