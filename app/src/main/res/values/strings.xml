@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Gravitation Simulation 2D</string>
-    <string name="add">Add a Planet</string>
-    <string name="delete">Delete a Planet</string>
-    <string name="change">Change a Planet</string>
-    <string name="run">Run the Simulation</string>
+    <string name="add_button">Add a Planet</string>
+    <string name="delete_button">Delete a Planet</string>
+    <string name="change_button">Change a Planet</string>
+    <string name="run_button">Run the Simulation</string>
     <string name="x_settingText">X:</string>
     <string name="y_settingText">Y:</string>
     <string name="x_velocity_settingText">X Vel:</string>
@@ -14,8 +14,14 @@
     <string name="km_div_s_settingText">km/s</string>
     <string name="kg_settingText">kg</string>
     <string name="empty_string"> </string>
-    <string name="play_pause">Play-Pause</string>
-    <string name="restart">Restart</string>
-    <string name="back_to_initialisation">Back to the Initialisation</string>
-    <string name="sound_on_off">Sound On-Off</string>
+    <string name="play_pause_button">Play-Pause</string>
+    <string name="restart_button">Restart</string>
+    <string name="back_to_initialisation_button">Back to the Initialisation</string>
+    <string name="sound_on_off_button">Sound On-Off</string>
+    <string name="save_button">Save</string>
+    <string name="list_of_saved_records_button">List Of Saved Records</string>
+    <string name="load_simulation">Load Simulation</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="records">Records</string>
+    <string name="title">Title</string>
 </resources>

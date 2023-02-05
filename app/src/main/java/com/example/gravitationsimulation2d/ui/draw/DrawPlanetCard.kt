@@ -27,7 +27,7 @@ import com.example.gravitationsimulation2d.data_source
 @Composable
 fun PlanetImageCard(modifier: Modifier = Modifier) {
     Card (
-        modifier = modifier.padding(4.dp),
+        modifier = modifier.padding(8.dp),
         elevation = 4.dp
     ) {
         var state by rememberSaveable {
@@ -48,7 +48,7 @@ fun PlanetImageCard(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun DrawPlanetImage(planetImage: PlanetImage, state: Boolean, onChange: () -> Unit, modifier: Modifier = Modifier) {
+fun DrawPlanetImage(planetImage: PlanetImage, state: Boolean = false, onChange: () -> Unit = { }, modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(id = planetImage.imageId),
         contentDescription = null,

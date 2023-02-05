@@ -3,6 +3,7 @@ package com.example.gravitationsimulation2d.func
 import com.example.gravitationsimulation2d.data.CelestialBody
 import com.example.gravitationsimulation2d.data.nextPlanetId
 import com.example.gravitationsimulation2d.data_source
+import java.util.Calendar
 import kotlin.math.pow
 
 
@@ -59,7 +60,7 @@ fun changeValuesOf(planets: MutableList<CelestialBody>) {
     }
 }
 
-fun convertPlanetsToSimulationRecord(planets: MutableList<CelestialBody>): String {
+fun convertPlanetsToPlanetListString(planets: MutableList<CelestialBody>): String {
     var result = ""
     for (index in 0 until planets.size) {
         val planet = planets[index]
@@ -69,7 +70,7 @@ fun convertPlanetsToSimulationRecord(planets: MutableList<CelestialBody>): Strin
     return result
 }
 
-fun convertSimulationRecordToPlanets(record: String): MutableList<CelestialBody> {
+fun convertPlanetListStringToPlanets(record: String): MutableList<CelestialBody> {
     val result = mutableListOf<CelestialBody>()
     val planetStats = record.split(';')
     for (planetStat in planetStats) {
@@ -85,4 +86,15 @@ fun convertSimulationRecordToPlanets(record: String): MutableList<CelestialBody>
         result.add(planet)
     }
     return result
+}
+
+fun getCurrentDate():String { // "hh:mm:ss - dd/mm/yyyy"
+    val cal = Calendar.getInstance()
+    val year = cal.get(Calendar.YEAR)
+    val month = cal.get(Calendar.MONTH)
+    val day = cal.get(Calendar.DAY_OF_MONTH)
+    val hour = cal.get(Calendar.HOUR_OF_DAY)
+    val minute = cal.get(Calendar.MINUTE)
+    val second = cal.get(Calendar.SECOND)
+    return String.format("%02d:%02d:%02d - %02d/%02d/%04d", hour, minute, second, day, month, year)
 }

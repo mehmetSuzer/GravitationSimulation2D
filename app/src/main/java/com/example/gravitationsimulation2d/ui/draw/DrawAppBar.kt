@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.gravitationsimulation2d.R
 import com.example.gravitationsimulation2d.Screen
 import com.example.gravitationsimulation2d.data.CelestialBody
@@ -26,32 +28,74 @@ import com.example.gravitationsimulation2d.mp
 
 @Composable
 fun AppTopBarInitScreen(
-    addPlanet: () -> Unit,
-    deletePlanet: () -> Unit,
-    changePlanet: () -> Unit,
     handleAudio: () -> Unit,
-    runSimulation: () -> Unit,
+    saveSimulation: () -> Unit,
+    listRecords: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var audioIsPlaying by rememberSaveable {
         mutableStateOf(if (mp != null) mp!!.isPlaying else false)
     }
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .height(48.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            modifier = Modifier
-                .size(64.dp)
-                .padding(8.dp),
+            modifier = Modifier.size(48.dp),
             painter = painterResource(id = R.drawable.app_logo),
             contentDescription = null
         )
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(onClick = { handleAudio(); audioIsPlaying = !audioIsPlaying }) {
+            Icon(
+                imageVector = if (audioIsPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
+                tint = MaterialTheme.colors.secondary,
+                contentDescription = stringResource(R.string.sound_on_off_button),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        IconButton(onClick = { saveSimulation() }) {
+            Icon(
+                imageVector = Icons.Filled.Save,
+                tint = MaterialTheme.colors.secondary,
+                contentDescription = stringResource(R.string.save_button),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        IconButton(onClick = { listRecords() }) {
+            Icon(
+                imageVector = Icons.Filled.List,
+                tint = MaterialTheme.colors.secondary,
+                contentDescription = stringResource(R.string.list_of_saved_records_button),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun AppBottomBarInitScreen(
+    addPlanet: () -> Unit,
+    deletePlanet: () -> Unit,
+    changePlanet: () -> Unit,
+    runSimulation: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .height(40.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         IconButton(onClick = { addPlanet() }) {
             Icon(
                 imageVector = Icons.Filled.Add,
                 tint = MaterialTheme.colors.secondary,
-                contentDescription = stringResource(R.string.add),
+                contentDescription = stringResource(R.string.add_button),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -59,7 +103,7 @@ fun AppTopBarInitScreen(
             Icon(
                 imageVector = Icons.Filled.Delete,
                 tint = MaterialTheme.colors.secondary,
-                contentDescription = stringResource(R.string.delete),
+                contentDescription = stringResource(R.string.delete_button),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -67,15 +111,7 @@ fun AppTopBarInitScreen(
             Icon(
                 imageVector = Icons.Filled.ChangeCircle,
                 tint = MaterialTheme.colors.secondary,
-                contentDescription = stringResource(R.string.change),
-                modifier = Modifier.size(24.dp)
-            )
-        }
-        IconButton(onClick = { handleAudio(); audioIsPlaying = !audioIsPlaying }) {
-            Icon(
-                imageVector = if (audioIsPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
-                tint = MaterialTheme.colors.secondary,
-                contentDescription = stringResource(R.string.sound_on_off),
+                contentDescription = stringResource(R.string.change_button),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -84,7 +120,7 @@ fun AppTopBarInitScreen(
             Icon(
                 imageVector = Icons.Filled.PlayCircle,
                 tint = MaterialTheme.colors.secondary,
-                contentDescription = stringResource(R.string.run),
+                contentDescription = stringResource(R.string.run_button),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -111,7 +147,7 @@ fun AppTopBarSimulationScreen(
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
                 tint = MaterialTheme.colors.secondary,
-                contentDescription = stringResource(R.string.back_to_initialisation),
+                contentDescription = stringResource(R.string.back_to_initialisation_button),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -119,7 +155,7 @@ fun AppTopBarSimulationScreen(
             Icon(
                 imageVector = if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                 tint = MaterialTheme.colors.secondary,
-                contentDescription = stringResource(R.string.play_pause),
+                contentDescription = stringResource(R.string.play_pause_button),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -127,10 +163,38 @@ fun AppTopBarSimulationScreen(
             Icon(
                 imageVector = Icons.Filled.RestartAlt,
                 tint = MaterialTheme.colors.secondary,
-                contentDescription = stringResource(R.string.restart),
+                contentDescription = stringResource(R.string.restart_button),
                 modifier = Modifier.size(24.dp)
             )
         }
         DrawInitialisedPlanetList(planets, current_screen, Color.Green, {  })
+    }
+}
+
+@Composable
+fun AppTopBarRecordsScreen(
+    backToInitialisation: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = { backToInitialisation() }) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                tint = MaterialTheme.colors.secondary,
+                contentDescription = stringResource(R.string.back_to_initialisation_button),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.weight(0.4f))
+        Text(
+            text = stringResource(R.string.records),
+            color = MaterialTheme.colors.onSecondary,
+            fontSize = 24.sp,
+            style = MaterialTheme.typography.h3
+        )
+        Spacer(modifier = Modifier.weight(0.6f))
     }
 }

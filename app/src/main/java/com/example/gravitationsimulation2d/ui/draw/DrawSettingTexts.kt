@@ -27,7 +27,8 @@ import com.example.gravitationsimulation2d.data_source
 
 @Composable
 fun CelestialBodySettingTextList(state: Boolean, modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier.background(MaterialTheme.colors.background)
+    LazyColumn(modifier = modifier
+        .background(MaterialTheme.colors.background)
     ) {
         items(data_source.loadSettingTexts()) { settingText ->
             CelestialBodySettingText(settingText, state, { input -> settingText.setInput(input) })
@@ -53,7 +54,7 @@ fun CelestialBodySettingText(settingText: SettingText, state: Boolean, onChange:
             Text(
                 text = stringResource(id = settingText.firstTextId),
                 style = MaterialTheme.typography.h2,
-                modifier = Modifier.width(30.dp),
+                modifier = Modifier.width(36.dp),
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -89,7 +90,7 @@ fun CelestialBodySettingText(settingText: SettingText, state: Boolean, onChange:
             Text(
                 text = stringResource(id = settingText.secondTextId),
                 style = MaterialTheme.typography.h2,
-                modifier = Modifier.width(40.dp),
+                modifier = Modifier.width(32.dp),
                 textAlign = TextAlign.Center
             )
         }

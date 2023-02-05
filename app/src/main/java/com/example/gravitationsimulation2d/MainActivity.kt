@@ -12,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gravitationsimulation2d.data.CelestialBody
@@ -34,14 +35,17 @@ https://developer.android.com/codelabs/jetpack-compose-state#8
 TODO LIST
 when the screen is rotated, planets disappear
 colors of the app bar and the status bar must be same
-enumeration of planets in the simulation screen
 deltaTime varies significantly when a button is pressed, therefore the simulation acts differently whenever it runs
 
 Remove unnecessary parts
  */
 
 enum class Screen {
-    Init, Simulation
+    Init, Simulation, Records
+}
+
+enum class PopUp {
+    Open, Close
 }
 
 val data_source: Datasource = Datasource()
@@ -101,34 +105,24 @@ fun GravitationSimulation2DApp(
     val simulation by remember {
         mutableStateOf(Simulation(planets))
     }
+    var popUpState by rememberSaveable {
+        mutableStateOf(PopUp.Close)
+    }
 
     if (currentScreen == Screen.Init) {
         Scaffold(
             topBar = {
                 AppTopBarInitScreen(
                     {
-                        addPlanetToList(planets)                          // add planet button
-                    },
-                    { deletePlanetFromList(planets)                       // delete planet button
-                        data_source.nullAllPrevInputs()
-                        selectedPlanetChange = !selectedPlanetChange
-                    },
-                    {
-                        changeValuesOf(planets)                           // change planet button
-                        val planet: CelestialBody? = getSelectedInitialisedPlanet(planets)
-                        data_source.updateSettingTextsPrevInputs(planet)
-                        selectedPlanetChange = !selectedPlanetChange
-                    },
-                    {
-                        if (mp != null) {                                  // audio button
+                        if (mp != null) {                                       // audio button
                             if (mp!!.isPlaying) mp!!.pause() else mp!!.start()
                         }
-                    },
-                    {
-                        currentScreen = Screen.Simulation                 // run simulation button
-                        unselectAllPlanets(planets)
-                        data_source.setInitialPlanetStates(planets)
-                        simulation.stop()
+                    }, {
+                        if (!planets.isEmpty()) {
+                            popUpState = PopUp.Open                             // save simulation
+                        }
+                    }, {
+                        currentScreen = Screen.Records                          // list records
                     }
                 )
             }
@@ -145,7 +139,41 @@ fun GravitationSimulation2DApp(
                     }
                 )
                 PlanetImageCard()
-                CelestialBodySettingTextList(selectedPlanetChange)
+                CelestialBodySettingTextList(selectedPlanetChange, Modifier.weight(1f))
+                AppBottomBarInitScreen(
+                    {
+                        addPlanetToList(planets)                                // add planet button
+                    }, {
+                        deletePlanetFromList(planets)                             // delete planet button
+                        data_source.nullAllPrevInputs()
+                        selectedPlanetChange = !selectedPlanetChange
+                    }, {
+                        changeValuesOf(planets)                                 // change planet button
+                        val planet: CelestialBody? = getSelectedInitialisedPlanet(planets)
+                        data_source.updateSettingTextsPrevInputs(planet)
+                        selectedPlanetChange = !selectedPlanetChange
+                    }, {
+                        currentScreen = Screen.Simulation                       // run simulation button
+                        unselectAllPlanets(planets)
+                        data_source.setInitialPlanetStates(planets)
+                        simulation.stop()
+                    }
+                )
+                if (popUpState == PopUp.Open) {
+                    RecordSavePopUp(
+                        saveRecord = {title ->
+                            if (title.isNotEmpty()) {
+                                val planetList = convertPlanetsToPlanetListString(planets)     // save simulation
+                                val record = SimulationRecord(title = title, planetList = planetList, date = getCurrentDate())
+                                homeViewModel.addRecord(record)
+                                popUpState = PopUp.Close
+                            }
+                        },
+                        cancelSaving = {
+                            popUpState = PopUp.Close
+                        }
+                    )
+                }
             }
         }
     }
@@ -166,6 +194,31 @@ fun GravitationSimulation2DApp(
             }
         ) {
             RunSimulation(simulation)
+        }
+    }
+    else if (currentScreen == Screen.Records) {
+        Scaffold(
+            topBar = {
+                AppTopBarRecordsScreen(backToInitialisation = {
+                    currentScreen = Screen.Init
+                    }
+                )
+            }
+        ) {
+            SimulationRecordsList(
+                recordListState.value,
+                { record ->
+                    homeViewModel.deleteRecord(record)
+                },
+                { record ->
+                    val planetList = convertPlanetListStringToPlanets(record.planetList)
+                    planets.removeAll { true }
+                    for (planet in planetList) {
+                        planets.add(planet)
+                    }
+                    currentScreen = Screen.Init
+                }
+            )
         }
     }
 }

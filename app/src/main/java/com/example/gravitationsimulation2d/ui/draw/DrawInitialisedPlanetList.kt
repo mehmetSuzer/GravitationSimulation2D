@@ -38,13 +38,13 @@ fun DrawInitialisedPlanetList(
     }
     LazyRow(
         modifier = modifier
-            .padding(8.dp)
+            .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
             .fillMaxWidth()
             .size(48.dp)
             .border(
-                width = 4.dp,
+                width = 2.dp,
                 color = borderColor,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(4.dp)
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
