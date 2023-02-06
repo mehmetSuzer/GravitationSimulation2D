@@ -51,21 +51,22 @@ class Simulation(var planets: MutableList<Planet>) {
     // If two planets get too close two each other, the bigger planet in terms of mass eats the other
     private fun handleCollusion() {
         for (i in 0 until planets.size-1) {
+            val planet1 = planets[i]
             for (j in i+1 until planets.size) {
-                val planet1 = planets[i]
                 val planet2 = planets[j]
-                if (planet1.overlapsWith(planet2)) {
+                if (!planet1.consumed && !planet2.consumed && planet1.overlapsWith(planet2)) {
                     if (planet1.mass > planet2.mass) {
                         planet1.collide(planet2)
-                        planets.removeAt(j)
+                        planet2.consumed = true
                     }
                     else {
                         planet2.collide(planet1)
-                        planets.removeAt(i)
+                        planet1.consumed = true
                     }
                 }
             }
         }
+        planets.removeAll { planet -> planet.consumed }
     }
 }
 

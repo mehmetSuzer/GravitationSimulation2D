@@ -31,6 +31,7 @@ class Planet(
     var imageId by mutableStateOf(imageIdArg)
     var mass by mutableStateOf(massCoef * 10.0.pow(massPower))    // kg
     var selected: Boolean = false
+    var consumed: Boolean = false
     val radius: Int = 12
     val orbit = arrayOfNulls<OrbitDot>(ORBIT_SIZE)
     private var orbitIndex: Int = 0
@@ -59,10 +60,10 @@ class Planet(
         }
     }
 
-    // Returns true if the distance between centers of two different planets is less than the sum of radius
+    // Returns true if the distance between centers of two different planets is less than the radius
     // Otherwise, returns false
     fun overlapsWith(other: Planet): Boolean {
-        return this.id != other.id && distance(other)/SCALE < this.radius+other.radius
+        return this.id != other.id && distance(other)/SCALE < this.radius
     }
 
     // Applies force to another planet and changes its velocity

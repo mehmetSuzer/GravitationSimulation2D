@@ -21,17 +21,7 @@ import com.example.gravitationsimulation2d.data.*
 fun DrawPlanet(planet: Planet, modifier: Modifier = Modifier) {
     val planetSize = (planet.radius*2).dp
     if (planet.selected) {
-        for (dot in planet.orbit) {
-            if (dot != null) {
-                Box(
-                    modifier = Modifier
-                        .offset(dot.x.dp, dot.y.dp)
-                        .clip(CircleShape)
-                        .size(ORBIT_DOT_SIZE.dp)
-                        .background(MaterialTheme.colors.onBackground)
-                )
-            }
-        }
+        DrawOrbit(planet.orbit)
     }
     Box(
         modifier = modifier
@@ -44,6 +34,21 @@ fun DrawPlanet(planet: Planet, modifier: Modifier = Modifier) {
             modifier = Modifier.size(planetSize),
             contentDescription = null
         )
+    }
+}
+
+@Composable
+fun DrawOrbit(orbit: Array<OrbitDot?>, modifier: Modifier = Modifier) {
+    for (dot in orbit) {
+        if (dot != null) {
+            Box(
+                modifier = modifier
+                    .offset(dot.x.dp, dot.y.dp)
+                    .clip(CircleShape)
+                    .size(ORBIT_DOT_SIZE.dp)
+                    .background(MaterialTheme.colors.onBackground)
+            )
+        }
     }
 }
 
