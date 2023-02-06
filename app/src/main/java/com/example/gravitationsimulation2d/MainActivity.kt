@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.gravitationsimulation2d.data.Datasource
 import com.example.gravitationsimulation2d.data.Planet
 import com.example.gravitationsimulation2d.data.Simulation
+import com.example.gravitationsimulation2d.data.simulationSpeed
 import com.example.gravitationsimulation2d.func.*
 import com.example.gravitationsimulation2d.model.SimulationRecord
 import com.example.gravitationsimulation2d.ui.draw.*
@@ -33,7 +34,6 @@ import kotlinx.coroutines.flow.flowOf
 TODO LIST
 when the screen is rotated, planets disappear
 colors of the app bar and the status bar must be same
-deltaTime varies significantly when a button is pressed, therefore the simulation acts differently whenever it runs
  */
 
 enum class Screen {
@@ -41,7 +41,7 @@ enum class Screen {
 }
 
 enum class PopUp {
-    Open, Close
+    Save, Speed, Close
 }
 
 val data_source: Datasource = Datasource()
@@ -108,17 +108,18 @@ fun GravitationSimulation2DApp(
         Scaffold(
             topBar = {
                 AppTopBarInitScreen(
+                    { popUpState = PopUp.Speed },                               // change speed of the simulation
                     {
-                        if (mp != null) {                                       // audio button
+                        if (mp != null) {                                       // turn on-off audio
                             if (mp!!.isPlaying) mp!!.pause() else mp!!.start()
                         }
-                    }, {
+                    },
+                    {
                         if (!planets.isEmpty()) {
-                            popUpState = PopUp.Open                             // save a simulation
+                            popUpState = PopUp.Save                             // save a simulation
                         }
-                    }, {
-                        currentScreen = Screen.Records                          // list records
-                    }
+                    },
+                    { currentScreen = Screen.Records }                           // list records
                 )
             }
         ) {
@@ -154,7 +155,7 @@ fun GravitationSimulation2DApp(
                         simulation.stop()
                     }
                 )
-                if (popUpState == PopUp.Open) {
+                if (popUpState == PopUp.Save) {
                     RecordSavePopUp(
                         saveRecord = {title ->
                             if (title.isNotEmpty()) {
@@ -167,6 +168,13 @@ fun GravitationSimulation2DApp(
                         cancelSaving = {
                             popUpState = PopUp.Close
                         }
+                    )
+                }
+                else if (popUpState == PopUp.Speed) {
+                    SimulationSpeedPopUp(
+                        updateSpeed = { newSpeed -> simulationSpeed = newSpeed; popUpState = PopUp.Close },
+                        cancelUpdating = { popUpState = PopUp.Close },
+                        simulationSpeed
                     )
                 }
             }

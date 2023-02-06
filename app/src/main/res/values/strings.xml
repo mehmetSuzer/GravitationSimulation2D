@@ -24,4 +24,6 @@
     <string name="cancel_button">Cancel</string>
     <string name="records">Records</string>
     <string name="title">Title</string>
+    <string name="simulation_speed">Simulation Speed</string>
+    <string name="update">Update</string>
 </resources>

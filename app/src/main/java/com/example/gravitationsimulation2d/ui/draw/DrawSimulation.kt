@@ -12,7 +12,6 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.gravitationsimulation2d.data.*
@@ -54,11 +53,10 @@ fun DrawOrbit(orbit: Array<OrbitDot?>, modifier: Modifier = Modifier) {
 
 @Composable
 fun RunSimulation(simulation: Simulation, modifier: Modifier = Modifier) {
-    val density = LocalDensity.current // use it to get results independent of screen aspects
     LaunchedEffect(Unit) {
         while (true) {
-            withFrameNanos {
-                simulation.update(it)
+            withFrameNanos {        // use the time if difference between frames is needed
+                simulation.update()
             }
         }
     }

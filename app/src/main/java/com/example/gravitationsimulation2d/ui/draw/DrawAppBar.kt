@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.gravitationsimulation2d.R
 import com.example.gravitationsimulation2d.Screen
 import com.example.gravitationsimulation2d.data.Planet
@@ -28,6 +27,7 @@ import com.example.gravitationsimulation2d.mp
 
 @Composable
 fun AppTopBarInitScreen(
+    changeSimulationSpeed: () -> Unit,
     handleAudio: () -> Unit,
     saveSimulation: () -> Unit,
     listRecords: () -> Unit,
@@ -49,6 +49,14 @@ fun AppTopBarInitScreen(
             contentDescription = null
         )
         Spacer(modifier = Modifier.weight(1f))
+        IconButton(onClick = { changeSimulationSpeed() }) {
+            Icon(
+                imageVector = Icons.Filled.Speed,
+                tint = MaterialTheme.colors.secondary,
+                contentDescription = stringResource(R.string.simulation_speed),
+                modifier = Modifier.size(24.dp)
+            )
+        }
         IconButton(onClick = { handleAudio(); audioIsPlaying = !audioIsPlaying }) {
             Icon(
                 imageVector = if (audioIsPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,

@@ -8,8 +8,11 @@ import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
 
-const val G: Double = 6.674E-11     // gravitational constant (N.m^2/kg^2)
-const val SCALE: Double = 1.0E9     // m/dp
+const val G: Double = 6.674E-11              // gravitational constant (N.m^2/kg^2)
+const val DELTA_T: Double = 365.0*24.0*120.0 // period that the positions and velocities of planets assumed to be constant
+const val SCALE: Double = 1.0E9              // m/dp
+
+var simulationSpeed = 0.5f
 var nextPlanetId: Long = 0
 
 class Planet(
@@ -35,6 +38,7 @@ class Planet(
     val radius: Int = 12
     val orbit = arrayOfNulls<OrbitDot>(ORBIT_SIZE)
     private var orbitIndex: Int = 0
+    private var orbitCount: Int = 0
 
     // Returns true if the point is in the planet
     fun containsPoint(x: Double, y: Double): Boolean {
@@ -51,12 +55,15 @@ class Planet(
     }
 
     // Updates the coordinates of the planet and if it is selected, an orbit dot is added to "orbit"
-    fun move(deltaT: Double) {
-        x += xVelocity * 1000.0 * deltaT / SCALE      // dp
-        y += yVelocity * 1000.0 * deltaT / SCALE      // dp
+    fun move() {
+        x += xVelocity * 1000.0 * DELTA_T * simulationSpeed / SCALE      // dp
+        y += yVelocity * 1000.0 * DELTA_T * simulationSpeed / SCALE      // dp
         if (selected) {
-            orbit[orbitIndex] = OrbitDot(x.toInt()+radius/2, y.toInt()+radius/2)
-            orbitIndex = (orbitIndex+1) % ORBIT_SIZE
+            if (++orbitCount >= 1.0f/simulationSpeed) {
+                orbit[orbitIndex] = OrbitDot(x.toInt() + radius / 2, y.toInt() + radius / 2)
+                orbitIndex = (orbitIndex + 1) % ORBIT_SIZE
+                orbitCount = 0
+            }
         }
     }
 
@@ -69,13 +76,13 @@ class Planet(
     // Applies force to another planet and changes its velocity
     // F = G.m1.m2/R^2
     // F.dt = m.dv
-    fun applyForce(other: Planet, deltaT: Double) {
-        val dist = this.distance(other)                             // m
-        val force = G * this.mass * other.mass / (dist*dist)        // Newton
-        val forceX = force * SCALE * (this.x - other.x) / dist      // Newton
-        val forceY = force * SCALE * (this.y - other.y) / dist      // Newton
-        other.xVelocity += forceX * deltaT / other.mass / 1000.0   // km/s
-        other.yVelocity += forceY * deltaT / other.mass / 1000.0   // km/s
+    fun applyForce(other: Planet) {
+        val dist = this.distance(other)                                               // m
+        val force = G * this.mass * other.mass / (dist*dist)                          // Newton
+        val forceX = force * SCALE * (this.x - other.x) / dist                        // Newton
+        val forceY = force * SCALE * (this.y - other.y) / dist                        // Newton
+        other.xVelocity += forceX * DELTA_T * simulationSpeed / other.mass / 1000.0   // km/s
+        other.yVelocity += forceY * DELTA_T * simulationSpeed / other.mass / 1000.0   // km/s
     }
 
     // Returns a copy of the planet
