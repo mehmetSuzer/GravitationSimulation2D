@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.example.gravitationsimulation2d.data.*
 
 @Composable
-fun DrawCelestialBody(planet: CelestialBody, modifier: Modifier = Modifier) {
+fun DrawPlanet(planet: Planet, modifier: Modifier = Modifier) {
     val planetSize = (planet.radius*2).dp
     if (planet.selected) {
         for (dot in planet.orbit) {
@@ -63,8 +63,8 @@ fun RunSimulation(simulation: Simulation, modifier: Modifier = Modifier) {
             .fillMaxHeight()
             .clipToBounds()
     ) {
-        simulation.planets.forEach {planet: CelestialBody ->
-            DrawCelestialBody(planet)
+        simulation.planets.forEach {planet: Planet ->
+            DrawPlanet(planet)
         }
     }
 }

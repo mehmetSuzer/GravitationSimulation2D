@@ -10,11 +10,11 @@ private enum class SimulationState {
 
 const val DELTA_TIME_MULTIPLIER = 0.042048
 
-
-class Simulation(var planets: MutableList<CelestialBody>) {
+class Simulation(var planets: MutableList<Planet>) {
     private var prevTime: Long = 0L
     private var state by mutableStateOf(SimulationState.STOPPED)
 
+    // All planets applies force to each other, assuming that the force does not change for deltaT seconds
     private fun applyForceToAll(deltaT: Double) {
         val size: Int = planets.size
         for (i in 0 until size-1) {
@@ -25,6 +25,7 @@ class Simulation(var planets: MutableList<CelestialBody>) {
         }
     }
 
+    // Updates positions and velocities of planets in the simulation
     fun update(time: Long) {
         val realDelta: Double = DELTA_TIME_MULTIPLIER*(time-prevTime)
         prevTime = time
@@ -37,14 +38,17 @@ class Simulation(var planets: MutableList<CelestialBody>) {
         handleCollusion()
     }
 
+    // If the simulation is running, it stops, and vice versa
     fun changeState() {
         state = if (state == SimulationState.RUNNING) SimulationState.STOPPED else SimulationState.RUNNING
     }
 
+    // Stops the simulation
     fun stop() {
         state = SimulationState.STOPPED
     }
 
+    // If two planets get too close two each other, the bigger planet in terms of mass eats the other
     private fun handleCollusion() {
         for (i in 0 until planets.size-1) {
             for (j in i+1 until planets.size) {

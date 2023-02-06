@@ -15,8 +15,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.gravitationsimulation2d.data.CelestialBody
 import com.example.gravitationsimulation2d.data.Datasource
+import com.example.gravitationsimulation2d.data.Planet
 import com.example.gravitationsimulation2d.data.Simulation
 import com.example.gravitationsimulation2d.func.*
 import com.example.gravitationsimulation2d.model.SimulationRecord
@@ -29,15 +29,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 /*
-State in Jetpack Composable
-https://developer.android.com/codelabs/jetpack-compose-state#8
 
 TODO LIST
 when the screen is rotated, planets disappear
 colors of the app bar and the status bar must be same
 deltaTime varies significantly when a button is pressed, therefore the simulation acts differently whenever it runs
-
-Remove unnecessary parts
  */
 
 enum class Screen {
@@ -49,7 +45,6 @@ enum class PopUp {
 }
 
 val data_source: Datasource = Datasource()
-val borderColor = Color(red = 105, green = 205, blue = 216)
 var mp: MediaPlayer? = null
 var audioWasPlaying = false
 
@@ -97,7 +92,7 @@ fun GravitationSimulation2DApp(
         mutableStateOf(Screen.Init)
     }
     val planets = remember {
-        mutableListOf<CelestialBody>().toMutableStateList()
+        mutableListOf<Planet>().toMutableStateList()
     }
     var selectedPlanetChange by rememberSaveable {
         mutableStateOf(false)
@@ -119,7 +114,7 @@ fun GravitationSimulation2DApp(
                         }
                     }, {
                         if (!planets.isEmpty()) {
-                            popUpState = PopUp.Open                             // save simulation
+                            popUpState = PopUp.Open                             // save a simulation
                         }
                     }, {
                         currentScreen = Screen.Records                          // list records
@@ -133,13 +128,13 @@ fun GravitationSimulation2DApp(
                     currentScreen,
                     Color.Red,
                     {
-                        val planet: CelestialBody? = getSelectedInitialisedPlanet(planets)  // clicking a planet
+                        val planet: Planet? = getSelectedInitialisedPlanet(planets)  // clicking a planet
                         data_source.updateSettingTextsPrevInputs(planet)
                         selectedPlanetChange = !selectedPlanetChange
                     }
                 )
                 PlanetImageCard()
-                CelestialBodySettingTextList(selectedPlanetChange, Modifier.weight(1f))
+                PlanetSettingTextList(selectedPlanetChange, Modifier.weight(1f))
                 AppBottomBarInitScreen(
                     {
                         addPlanetToList(planets)                                // add planet button
@@ -149,7 +144,7 @@ fun GravitationSimulation2DApp(
                         selectedPlanetChange = !selectedPlanetChange
                     }, {
                         changeValuesOf(planets)                                 // change planet button
-                        val planet: CelestialBody? = getSelectedInitialisedPlanet(planets)
+                        val planet: Planet? = getSelectedInitialisedPlanet(planets)
                         data_source.updateSettingTextsPrevInputs(planet)
                         selectedPlanetChange = !selectedPlanetChange
                     }, {

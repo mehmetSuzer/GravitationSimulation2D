@@ -12,7 +12,7 @@ const val G: Double = 6.674E-11     // gravitational constant (N.m^2/kg^2)
 const val SCALE: Double = 1.0E9     // m/dp
 var nextPlanetId: Long = 0
 
-class CelestialBody(
+class Planet(
     xArg: Double,              // density pixel (dp)
     yArg: Double,              // density pixel (dp)
     xVelocityArg: Double,      // km/s (+ for right, - for left)
@@ -35,26 +35,21 @@ class CelestialBody(
     val orbit = arrayOfNulls<OrbitDot>(ORBIT_SIZE)
     private var orbitIndex: Int = 0
 
-    /*
-    Returns true if the point is in the celestial body
-     */
+    // Returns true if the point is in the planet
     fun containsPoint(x: Double, y: Double): Boolean {
         val xDiff = this.x-x
         val yDiff = this.y-y
         return (xDiff*xDiff + yDiff*yDiff).pow(0.5) < 2*this.radius
     }
-    /*
-    Returns distance in terms of m
-     */
-    private fun distance(other: CelestialBody): Double {
+
+    // Returns distance in terms of m
+    private fun distance(other: Planet): Double {
         val xDiff = this.x-other.x
         val yDiff = this.y-other.y
         return (xDiff*xDiff + yDiff*yDiff).pow(0.5) * SCALE
     }
 
-    /*
-    Updates the coordinates of the celestial body
-     */
+    // Updates the coordinates of the planet and if it is selected, an orbit dot is added to "orbit"
     fun move(deltaT: Double) {
         x += xVelocity * 1000.0 * deltaT / SCALE      // dp
         y += yVelocity * 1000.0 * deltaT / SCALE      // dp
@@ -64,17 +59,16 @@ class CelestialBody(
         }
     }
 
-    /*
-    Returns true if the distance between centers of two different celestial bodies is less than the sum of radius
-     */
-    fun overlapsWith(other: CelestialBody): Boolean {
+    // Returns true if the distance between centers of two different planets is less than the sum of radius
+    // Otherwise, returns false
+    fun overlapsWith(other: Planet): Boolean {
         return this.id != other.id && distance(other)/SCALE < this.radius+other.radius
     }
 
-    /*
-    Applies force to another celestial body and changes its velocity
-     */
-    fun applyForce(other: CelestialBody, deltaT: Double) {
+    // Applies force to another planet and changes its velocity
+    // F = G.m1.m2/R^2
+    // F.dt = m.dv
+    fun applyForce(other: Planet, deltaT: Double) {
         val dist = this.distance(other)                             // m
         val force = G * this.mass * other.mass / (dist*dist)        // Newton
         val forceX = force * SCALE * (this.x - other.x) / dist      // Newton
@@ -83,28 +77,25 @@ class CelestialBody(
         other.yVelocity += forceY * deltaT / other.mass / 1000.0   // km/s
     }
 
-    /*
-    Returns a copy of the same celestial body
-     */
-    fun copy(): CelestialBody {
-        return CelestialBody(x, y, xVelocity, yVelocity, massCoef, massPower, imageId, nextPlanetId++)
+    // Returns a copy of the planet
+    fun copy(): Planet {
+        return Planet(x, y, xVelocity, yVelocity, massCoef, massPower, imageId, nextPlanetId++)
     }
 
-    /*
-    Collides with another lighter celestial body and consumes it
-     */
-    fun collide(other: CelestialBody) {
-        this.xVelocity = (this.xVelocity*this.mass + other.xVelocity*other.mass) / this.mass
-        this.yVelocity = (this.yVelocity*this.mass + other.yVelocity*other.mass) / this.mass
-        this.mass += other.mass
-        this.massPower = floor(log10(this.mass))
-        this.massCoef = this.mass / 10.0.pow(this.massPower)
+    // Collides with another lighter planets and consumes it
+    // new_m1 = m1+m2
+    // new_v1 = (m1.old_v1 + m2.v2) / new_m1
+    fun collide(other: Planet) {
+        val totalMass = this.mass+other.mass
+        this.xVelocity = (this.mass*this.xVelocity + other.mass*other.xVelocity) / totalMass
+        this.yVelocity = (this.mass*this.yVelocity + other.mass*other.yVelocity) / totalMass
+        this.mass = totalMass
+        this.massPower = floor(log10(totalMass))
+        this.massCoef = this.mass / 10.0.pow(totalMass)
     }
 
-    /*
-    Sets the selected field to the given boolean
-    If the celestial body is no longer selected, the orbit is cleared
-     */
+    // Sets the selected field to the given boolean
+    // If the planet is no longer selected, the orbit is cleared
     fun set_selected(bool: Boolean) {
         selected = bool
         if (!selected) {
@@ -114,6 +105,6 @@ class CelestialBody(
     }
 }
 
-val CelestialBody.xOffset: Int get() = x.toInt()-radius/2
-val CelestialBody.yOffset: Int get() = y.toInt()-radius/2
+val Planet.xOffset: Int get() = x.toInt()-radius/2
+val Planet.yOffset: Int get() = y.toInt()-radius/2
 

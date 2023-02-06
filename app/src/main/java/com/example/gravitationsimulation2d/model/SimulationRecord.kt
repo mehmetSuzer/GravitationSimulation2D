@@ -7,6 +7,6 @@ import androidx.room.PrimaryKey
 data class SimulationRecord(
     @PrimaryKey(autoGenerate = true) var roomId: Long? = null,
     val title: String,
-    val planetList: String,
+    val planetList: String, // planet1_stats;planet2_stats;...;planetN_stats
     val date: String        // "hh:mm:ss - dd/mm/yyyy"
 )

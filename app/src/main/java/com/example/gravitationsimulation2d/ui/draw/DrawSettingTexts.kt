@@ -26,18 +26,18 @@ import com.example.gravitationsimulation2d.data_source
 
 
 @Composable
-fun CelestialBodySettingTextList(state: Boolean, modifier: Modifier = Modifier) {
+fun PlanetSettingTextList(state: Boolean, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier
         .background(MaterialTheme.colors.background)
     ) {
         items(data_source.loadSettingTexts()) { settingText ->
-            CelestialBodySettingText(settingText, state, { input -> settingText.setInput(input) })
+            PlanetSettingText(settingText, state, { input -> settingText.setInput(input) })
         }
     }
 }
 
 @Composable
-fun CelestialBodySettingText(settingText: SettingText, state: Boolean, onChange: (String) -> Boolean, modifier: Modifier = Modifier) {
+fun PlanetSettingText(settingText: SettingText, state: Boolean, onChange: (String) -> Boolean, modifier: Modifier = Modifier) {
     var input by rememberSaveable {
         mutableStateOf(settingText.userInput)
     }
@@ -71,17 +71,15 @@ fun CelestialBodySettingText(settingText: SettingText, state: Boolean, onChange:
                     ) {
                         Text(
                             text = settingText.textFiledHint,
-                            fontSize = 10.sp,
                             color = MaterialTheme.colors.onSecondary,
-                            style = MaterialTheme.typography.body1
+                            style = MaterialTheme.typography.h1
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         if (settingText.prevInput != null) {
                             Text(
                                 text = settingText.prevInput!!,
-                                fontSize = 10.sp,
                                 color = MaterialTheme.colors.onSecondary,
-                                style = MaterialTheme.typography.body1
+                                style = MaterialTheme.typography.h1
                             )
                         }
                     }

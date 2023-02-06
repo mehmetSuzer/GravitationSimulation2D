@@ -21,13 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.gravitationsimulation2d.*
-import com.example.gravitationsimulation2d.data.CelestialBody
+import com.example.gravitationsimulation2d.data.Planet
 import com.example.gravitationsimulation2d.func.unselectAllPlanets
 
+val borderColor = Color(red = 105, green = 205, blue = 216)
 
 @Composable
 fun DrawInitialisedPlanetList(
-    planets: MutableList<CelestialBody>,
+    planets: MutableList<Planet>,
     current_screen: Screen,
     planetBackGroundColor: Color,
     informUp: () -> Unit,
@@ -48,19 +49,19 @@ fun DrawInitialisedPlanetList(
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        items(planets) {celestial_body ->
+        items(planets) {planet ->
             DrawInitialisedPlanetImage(
-                celestial_body,
+                planet,
                 planetBackGroundColor,
                 state,
                 {
                     state = !state
                     if (current_screen == Screen.Init) {
-                        val prevSelected = celestial_body.selected
+                        val prevSelected = planet.selected
                         unselectAllPlanets(planets)
-                        celestial_body.set_selected(!prevSelected)
+                        planet.set_selected(!prevSelected)
                     } else if (current_screen == Screen.Simulation) {
-                        celestial_body.set_selected(!celestial_body.selected)
+                        planet.set_selected(!planet.selected)
                     }
                     informUp()
                 }
@@ -71,17 +72,17 @@ fun DrawInitialisedPlanetList(
 
 @Composable
 fun DrawInitialisedPlanetImage(
-    celestial_body: CelestialBody,
+    planet: Planet,
     backgroundColor: Color,
     state: Boolean,
     onChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Image(
-        painter = painterResource(id = celestial_body.imageId),
+        painter = painterResource(id = planet.imageId),
         contentDescription = null,
         modifier =
-        if (celestial_body.selected) modifier
+        if (planet.selected) modifier
             .border(
                 width = 2.dp,
                 color = borderColor,

@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.gravitationsimulation2d.R
-import com.example.gravitationsimulation2d.borderColor
 import com.example.gravitationsimulation2d.data.PlanetImage
 import com.example.gravitationsimulation2d.func.convertPlanetListStringToPlanets
 import com.example.gravitationsimulation2d.model.SimulationRecord

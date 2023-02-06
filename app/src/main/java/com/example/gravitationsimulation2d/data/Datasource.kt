@@ -40,8 +40,11 @@ class Datasource {
         SettingText(R.string.mass_power_settingText, R.string.kg_settingText, "24.0","$massPowerLowLimit≤...≤$massPowerHighLimit")
     )
 
-    private var initialPlanetStates = mutableListOf<CelestialBody>()
+    // Used to store the initial state of the planet initialised
+    // Loaded when the user restarts the simulation
+    private var initialPlanetStates = mutableListOf<Planet>()
 
+    // Returns the list of user inputs
     fun getUserInputs(): List<String> {
         val result: MutableList<String> = mutableListOf()
         for (settingText in settingTexts) {
@@ -50,14 +53,18 @@ class Datasource {
         return result
     }
 
+    // Returns a list of all planet images
     fun loadImages(): List<PlanetImage> {
         return planetImages
     }
 
+    // Returns a list of all setting texts
     fun loadSettingTexts(): List<SettingText> {
         return settingTexts
     }
 
+    // Select the given planet image and unselects all others
+    // If it is already selected, the given image is unselected
     fun selectImage(selectedImage: PlanetImage) {
         for (image in planetImages) {
             val previousState = image.selected
@@ -67,6 +74,8 @@ class Datasource {
         }
     }
 
+    // Returns the selected image id
+    // Returns -1 if no image is selected
     fun getSelectedImageId(): Int {
         for (image in planetImages) {
             if (image.selected)
@@ -75,6 +84,9 @@ class Datasource {
         return -1
     }
 
+    // Check whether the user inputs are valid doubles or not
+    // Then checks if the user inputs are in the valid interval
+    // Returns true if all inputs are valid, otherwise returns false
     fun inputsAreValid(): Boolean {
         val userInputs = this.getUserInputs()
         val x: Double? = userInputs[0].toDoubleOrNull()
@@ -99,6 +111,7 @@ class Datasource {
         return false
     }
 
+    // Sets null to all previous inputs of setting texts
     fun nullAllPrevInputs() {
         settingTexts[0].prevInput = null
         settingTexts[1].prevInput = null
@@ -108,7 +121,9 @@ class Datasource {
         settingTexts[5].prevInput = null
     }
 
-    fun updateSettingTextsPrevInputs(planet: CelestialBody?) {
+    // If the planet is not null, sets all previous input
+    // If it is null, clears previous inputs
+    fun updateSettingTextsPrevInputs(planet: Planet?) {
         if (planet != null) {
             settingTexts[0].prevInput = "current value:${planet.x}"
             settingTexts[1].prevInput = "current value:${planet.y}"
@@ -122,14 +137,17 @@ class Datasource {
         }
     }
 
-    fun setInitialPlanetStates(planets: MutableList<CelestialBody>) {
+    // Stores the initial states of the planets
+    fun setInitialPlanetStates(planets: MutableList<Planet>) {
         initialPlanetStates = mutableListOf()
         for (planet in planets) {
             initialPlanetStates.add(planet.copy())
         }
     }
 
-    fun reloadInitialPlanetStates(planets: MutableList<CelestialBody>) {
+    // Loads the initial state of the planets
+    // This function is called when the user restarts the simulation
+    fun reloadInitialPlanetStates(planets: MutableList<Planet>) {
         planets.removeAll { true }
         for (planet in initialPlanetStates) {
             planets.add(planet.copy())

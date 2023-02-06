@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.gravitationsimulation2d.data.PlanetImage
-import com.example.gravitationsimulation2d.borderColor
 import com.example.gravitationsimulation2d.data_source
 
 

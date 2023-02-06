@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gravitationsimulation2d.R
 import com.example.gravitationsimulation2d.Screen
-import com.example.gravitationsimulation2d.data.CelestialBody
+import com.example.gravitationsimulation2d.data.Planet
 import com.example.gravitationsimulation2d.mp
 
 
@@ -129,7 +129,7 @@ fun AppBottomBarInitScreen(
 
 @Composable
 fun AppTopBarSimulationScreen(
-    planets: MutableList<CelestialBody>,
+    planets: MutableList<Planet>,
     backToInitialisation: () -> Unit,
     onPlayPauseClick: () -> Unit,
     onRestartClick: () -> Unit,
@@ -192,8 +192,7 @@ fun AppTopBarRecordsScreen(
         Text(
             text = stringResource(R.string.records),
             color = MaterialTheme.colors.onSecondary,
-            fontSize = 24.sp,
-            style = MaterialTheme.typography.h3
+            style = MaterialTheme.typography.h4
         )
         Spacer(modifier = Modifier.weight(0.6f))
     }
