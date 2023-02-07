@@ -3,8 +3,10 @@ package com.example.gravitationsimulation2d.func
 import com.example.gravitationsimulation2d.data.Planet
 import com.example.gravitationsimulation2d.data.nextPlanetId
 import com.example.gravitationsimulation2d.data_source
+import com.example.gravitationsimulation2d.model.SimulationRecord
 import java.util.Calendar
 import kotlin.math.pow
+import kotlin.random.Random
 
 
 // Adds a planet to the list of initialised planets depending on the user inputs
@@ -97,7 +99,7 @@ fun convertPlanetListStringToPlanets(planetString: String): MutableList<Planet> 
     return result
 }
 
-// Returns the current date in the format "hh:mm:ss - dd/mm/yyyy"
+// Returns the current date in the format "hh:mm:ss-dd/mm/yyyy"
 fun getCurrentDate():String {
     val cal = Calendar.getInstance()
     val year = cal.get(Calendar.YEAR)
@@ -106,5 +108,20 @@ fun getCurrentDate():String {
     val hour = cal.get(Calendar.HOUR_OF_DAY)
     val minute = cal.get(Calendar.MINUTE)
     val second = cal.get(Calendar.SECOND)
-    return String.format("%02d:%02d:%02d - %02d/%02d/%04d", hour, minute, second, day, month, year)
+    return String.format("%02d:%02d:%02d-%02d/%02d/%04d", hour, minute, second, day, month, year)
+}
+
+// Removes tabs and whitespaces from the beginning and the end of the string and returns the rest
+fun strip(str: String): String {
+    var startIndex = 0
+    var endIndex = str.length-1
+    while (startIndex < str.length && (str[startIndex] == ' ' || str[startIndex] == '\t')) startIndex++
+    while (endIndex > startIndex &&  (str[endIndex] == ' ' || str[endIndex] == '\t')) endIndex--
+    return str.slice(startIndex..endIndex)
+}
+
+fun firebaseId(record: SimulationRecord): String {
+    val date = record.date.replace('/', ':')
+    val num = Random.nextLong()
+    return "$date-$num"
 }

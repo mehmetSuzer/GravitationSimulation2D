@@ -25,10 +25,10 @@ import com.example.gravitationsimulation2d.ui.draw.*
 import com.example.gravitationsimulation2d.ui.theme.GravitationSimulation2DTheme
 import com.example.gravitationsimulation2d.viewmodel.HomeViewModel
 import com.example.gravitationsimulation2d.viewmodel.HomeViewModelAbstract
+import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-
 /*
 
 TODO LIST
@@ -44,6 +44,7 @@ enum class PopUp {
     Save, Speed, Close
 }
 
+val recordsRef = FirebaseDatabase.getInstance().getReference("records")
 val data_source: Datasource = Datasource()
 var mp: MediaPlayer? = null
 var audioWasPlaying = false
@@ -53,12 +54,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val homeViewModel: HomeViewModel by viewModels()
+
         audioWasPlaying = false
         mp = MediaPlayer.create(this, R.raw.interstellar_main_theme)
         if (mp != null) {
             mp!!.isLooping = true
             mp!!.start()
         }
+
         setContent {
             GravitationSimulation2DTheme {
                 GravitationSimulation2DApp(
@@ -162,6 +165,7 @@ fun GravitationSimulation2DApp(
                                 val planetList = convertPlanetsToPlanetListString(planets)     // save simulation
                                 val record = SimulationRecord(title = title, planetList = planetList, date = getCurrentDate())
                                 homeViewModel.addRecord(record)
+                                recordsRef.child(firebaseId(record)).setValue(record)
                                 popUpState = PopUp.Close
                             }
                         },

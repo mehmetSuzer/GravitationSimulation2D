@@ -15,8 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.gravitationsimulation2d.R
+import com.example.gravitationsimulation2d.func.strip
 
-const val MAX_CHAR_NUMBER = 30
+const val MAX_CHAR_NUMBER = 20
 
 @Composable
 fun RecordSavePopUp(
@@ -78,7 +79,7 @@ fun RecordSavePopUp(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
-                    onClick = { saveRecord(txtState.value) },
+                    onClick = { saveRecord(strip(txtState.value)) },
                     modifier = Modifier.padding(end = 16.dp)
                 ) {
                     Text(

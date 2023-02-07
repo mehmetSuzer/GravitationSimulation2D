@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "6073300215",
+    "project_id": "gravitation-simulation-2d",
+    "storage_bucket": "gravitation-simulation-2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6073300215:android:7b15b0d8ab57d0955f0ff2",
+        "android_client_info": {
+          "package_name": "com.example.gravitationsimulation2d"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "6073300215-l7nbbe5j094l63upip3klosd9ta48lre.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUp0sm-tFTKqQoLyRieamNxuBqLUI3Z8Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "6073300215-l7nbbe5j094l63upip3klosd9ta48lre.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

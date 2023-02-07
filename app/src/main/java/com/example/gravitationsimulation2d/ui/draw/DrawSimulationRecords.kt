@@ -65,14 +65,14 @@ fun SimulationRecordUnit(
                     Text(
                         text = record.title,
                         color = MaterialTheme.colors.onSecondary,
-                        style = MaterialTheme.typography.h3,
+                        style = MaterialTheme.typography.h2,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = record.date,
                         color = MaterialTheme.colors.onSecondary,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.h1,
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 }
