@@ -26,8 +26,7 @@ import com.example.gravitationsimulation2d.data_source
 
 @Composable
 fun PlanetSettingTextList(state: Boolean, modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier
-        .background(MaterialTheme.colors.background)
+    LazyColumn(modifier = modifier.background(MaterialTheme.colors.background)
     ) {
         items(data_source.loadSettingTexts()) { settingText ->
             PlanetSettingText(settingText, state, { input -> settingText.setInput(input) })
@@ -37,9 +36,7 @@ fun PlanetSettingTextList(state: Boolean, modifier: Modifier = Modifier) {
 
 @Composable
 fun PlanetSettingText(settingText: SettingText, state: Boolean, onChange: (String) -> Boolean, modifier: Modifier = Modifier) {
-    var input by rememberSaveable {
-        mutableStateOf(settingText.userInput)
-    }
+    var input by rememberSaveable { mutableStateOf(settingText.userInput) }
     Card (
         modifier = modifier.padding(8.dp),
         elevation = 4.dp

@@ -27,7 +27,7 @@ class Datasource {
     private val yVelocityHighLimit = 100.0
     private val massCoefLowLimit = 1.0
     private val massCoefHighLimit = 9.9999
-    private val massPowerLowLimit = 12.0
+    private val massPowerLowLimit = 5.0
     private val massPowerHighLimit = 36.0
 
 

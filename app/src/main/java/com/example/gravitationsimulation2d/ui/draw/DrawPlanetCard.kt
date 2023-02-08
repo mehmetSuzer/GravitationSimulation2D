@@ -29,9 +29,7 @@ fun PlanetImageCard(modifier: Modifier = Modifier) {
         modifier = modifier.padding(8.dp),
         elevation = 4.dp
     ) {
-        var state by rememberSaveable {
-            mutableStateOf(false)
-        }
+        var state by rememberSaveable { mutableStateOf(false) }
         LazyRow(
             modifier = Modifier
                 .padding(8.dp)

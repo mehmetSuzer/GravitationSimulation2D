@@ -27,6 +27,7 @@ import com.example.gravitationsimulation2d.mp
 
 @Composable
 fun AppTopBarInitScreen(
+    changeSimulationScale: () -> Unit,
     changeSimulationSpeed: () -> Unit,
     handleAudio: () -> Unit,
     saveSimulation: () -> Unit,
@@ -49,6 +50,14 @@ fun AppTopBarInitScreen(
             contentDescription = null
         )
         Spacer(modifier = Modifier.weight(1f))
+        IconButton(onClick = { changeSimulationScale() }) {
+            Icon(
+                imageVector = Icons.Filled.OpenInFull,
+                tint = MaterialTheme.colors.secondary,
+                contentDescription = stringResource(R.string.simulation_scale),
+                modifier = Modifier.size(24.dp)
+            )
+        }
         IconButton(onClick = { changeSimulationSpeed() }) {
             Icon(
                 imageVector = Icons.Filled.Speed,
@@ -144,9 +153,7 @@ fun AppTopBarSimulationScreen(
     current_screen: Screen,
     modifier: Modifier = Modifier
 ) {
-    var playing by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var playing by rememberSaveable { mutableStateOf(false) }
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically

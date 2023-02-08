@@ -59,7 +59,7 @@ fun RecordSavePopUp(
                 value = txtState.value,
                 singleLine = true,
                 onValueChange = { txt ->
-                    if (txt.length <= MAX_CHAR_NUMBER) {
+                    if (txt.length <= MAX_CHAR_NUMBER && !(txt.isNotEmpty() && txt[txt.length-1] == '/')) {
                         txtState.value = txt
                     }
                 }

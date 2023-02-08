@@ -18,31 +18,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.gravitationsimulation2d.R
-import kotlin.math.log
 import kotlin.math.log10
 import kotlin.math.pow
 
-const val EarthYearConstant = 365.0*24.0*60.0
-val speedLowerLimit = (1.0 - log(1000.0, EarthYearConstant)).toFloat()
-val speedUpperLimit = (1.0 + log(1000.0, EarthYearConstant)).toFloat()
+const val scaleLowerLimit = 4.0f
+const val scaleUpperLimit = 15.0f
 
 @Composable
-fun SimulationSpeedPopUp(
-    updateSpeed: (Double) -> Unit,
+fun SimulationScalePopUp(
+    updateScale: (Double) -> Unit,
     cancelUpdating: () -> Unit,
-    currentSpeed: Double,
+    currentScale: Double,
     modifier: Modifier = Modifier
 ) {
     Dialog(onDismissRequest = cancelUpdating) {
-        val earthYearsPerSecondPower = rememberSaveable { mutableStateOf(log10(currentSpeed)/log10(EarthYearConstant)) }
+        val scalePower = rememberSaveable { mutableStateOf(log10(currentScale)) }
         Column(
             modifier = modifier
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colors.background)
         ) {
             Text(
-                text = stringResource(R.string.earth_years_per_simulation_seconds),
-                style = MaterialTheme.typography.h3,
+                text = stringResource(R.string.simulation_scale_in_m_per_dp),
+                style = MaterialTheme.typography.button,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
@@ -53,15 +51,15 @@ fun SimulationSpeedPopUp(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Slider(
-                    value = earthYearsPerSecondPower.value.toFloat(),
-                    onValueChange = { newPower -> earthYearsPerSecondPower.value = newPower.toDouble() },
-                    valueRange = speedLowerLimit..speedUpperLimit,
+                    value = scalePower.value.toFloat(),
+                    onValueChange = { newScalePower -> scalePower.value = newScalePower.toDouble() },
+                    valueRange = scaleLowerLimit..scaleUpperLimit,
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 8.dp, end = 8.dp, top = 8.dp)
                 )
                 Text(
-                    text = String.format("%.3f", EarthYearConstant.pow(earthYearsPerSecondPower.value-1.0)),
+                    text = String.format("10^%.2f", scalePower.value),
                     style = MaterialTheme.typography.h2,
                     modifier = Modifier
                         .width(56.dp)
@@ -83,7 +81,7 @@ fun SimulationSpeedPopUp(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
-                    onClick = { updateSpeed(EarthYearConstant.pow(earthYearsPerSecondPower.value)) },
+                    onClick = { updateScale(10.0.pow(scalePower.value)) },
                     modifier = Modifier.padding(end = 16.dp)
                 ) {
                     Text(

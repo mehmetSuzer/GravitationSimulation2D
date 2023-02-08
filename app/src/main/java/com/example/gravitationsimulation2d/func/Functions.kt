@@ -6,7 +6,6 @@ import com.example.gravitationsimulation2d.data_source
 import com.example.gravitationsimulation2d.model.SimulationRecord
 import java.util.Calendar
 import kotlin.math.pow
-import kotlin.random.Random
 
 
 // Adds a planet to the list of initialised planets depending on the user inputs
@@ -120,8 +119,9 @@ fun strip(str: String): String {
     return str.slice(startIndex..endIndex)
 }
 
+// Generates a Firebase ID for a simulation record
 fun firebaseId(record: SimulationRecord): String {
     val date = record.date.replace('/', ':')
-    val num = Random.nextLong()
-    return "$date-$num"
+    val title = record.title
+    return "{$title}_$date"
 }

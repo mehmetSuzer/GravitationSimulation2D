@@ -15,10 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.gravitationsimulation2d.data.Datasource
-import com.example.gravitationsimulation2d.data.Planet
-import com.example.gravitationsimulation2d.data.Simulation
-import com.example.gravitationsimulation2d.data.simulationSpeed
+import com.example.gravitationsimulation2d.data.*
 import com.example.gravitationsimulation2d.func.*
 import com.example.gravitationsimulation2d.model.SimulationRecord
 import com.example.gravitationsimulation2d.ui.draw.*
@@ -29,6 +26,9 @@ import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlin.math.log10
+import kotlin.math.pow
+
 /*
 
 TODO LIST
@@ -41,7 +41,7 @@ enum class Screen {
 }
 
 enum class PopUp {
-    Save, Speed, Close
+    Save, Speed, Scale, Close
 }
 
 val recordsRef = FirebaseDatabase.getInstance().getReference("records")
@@ -87,30 +87,19 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun GravitationSimulation2DApp(
-    homeViewModel: HomeViewModelAbstract
-) {
+fun GravitationSimulation2DApp(homeViewModel: HomeViewModelAbstract) {
     val recordListState = homeViewModel.simulationRecordFlow.collectAsState(initial = listOf())
-    var currentScreen by rememberSaveable {
-        mutableStateOf(Screen.Init)
-    }
-    val planets = remember {
-        mutableListOf<Planet>().toMutableStateList()
-    }
-    var selectedPlanetChange by rememberSaveable {
-        mutableStateOf(false)
-    }
-    val simulation by remember {
-        mutableStateOf(Simulation(planets))
-    }
-    var popUpState by rememberSaveable {
-        mutableStateOf(PopUp.Close)
-    }
+    var currentScreen by rememberSaveable { mutableStateOf(Screen.Init) }
+    val planets = remember { mutableListOf<Planet>().toMutableStateList() }
+    var selectedPlanetChange by rememberSaveable { mutableStateOf(false) }
+    val simulation by remember { mutableStateOf(Simulation(planets)) }
+    var popUpState by rememberSaveable { mutableStateOf(PopUp.Close) }
 
     if (currentScreen == Screen.Init) {
         Scaffold(
             topBar = {
                 AppTopBarInitScreen(
+                    { popUpState = PopUp.Scale },                               // change scale of the simulation
                     { popUpState = PopUp.Speed },                               // change speed of the simulation
                     {
                         if (mp != null) {                                       // turn on-off audio
@@ -163,7 +152,13 @@ fun GravitationSimulation2DApp(
                         saveRecord = {title ->
                             if (title.isNotEmpty()) {
                                 val planetList = convertPlanetsToPlanetListString(planets)     // save simulation
-                                val record = SimulationRecord(title = title, planetList = planetList, date = getCurrentDate())
+                                val record = SimulationRecord(
+                                    title = title,
+                                    planetList = planetList,
+                                    date = getCurrentDate(),
+                                    speed = log10(simulationSpeed),
+                                    scale = log10(simulationScale)
+                                )
                                 homeViewModel.addRecord(record)
                                 recordsRef.child(firebaseId(record)).setValue(record)
                                 popUpState = PopUp.Close
@@ -178,7 +173,14 @@ fun GravitationSimulation2DApp(
                     SimulationSpeedPopUp(
                         updateSpeed = { newSpeed -> simulationSpeed = newSpeed; popUpState = PopUp.Close },
                         cancelUpdating = { popUpState = PopUp.Close },
-                        simulationSpeed
+                        currentSpeed = simulationSpeed
+                    )
+                }
+                else if (popUpState == PopUp.Scale) {
+                    SimulationScalePopUp(
+                        updateScale = { newScale -> simulationScale = newScale; popUpState = PopUp.Close },
+                        cancelUpdating = { popUpState = PopUp.Close },
+                        currentScale = simulationScale
                     )
                 }
             }
@@ -215,14 +217,17 @@ fun GravitationSimulation2DApp(
             SimulationRecordsList(
                 recordListState.value,
                 { record ->
+                    recordsRef.child(firebaseId(record)).removeValue()                      // delete record
                     homeViewModel.deleteRecord(record)
                 },
                 { record ->
-                    val planetList = convertPlanetListStringToPlanets(record.planetList)
+                    val planetList = convertPlanetListStringToPlanets(record.planetList)    // load the simulation
                     planets.removeAll { true }
                     for (planet in planetList) {
                         planets.add(planet)
                     }
+                    simulationSpeed = 10.0.pow(record.speed)
+                    simulationScale = 10.0.pow(record.scale)
                     currentScreen = Screen.Init
                 }
             )

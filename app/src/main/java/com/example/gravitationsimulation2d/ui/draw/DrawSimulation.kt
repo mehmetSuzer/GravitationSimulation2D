@@ -55,7 +55,7 @@ fun DrawOrbit(orbit: Array<OrbitDot?>, modifier: Modifier = Modifier) {
 fun RunSimulation(simulation: Simulation, modifier: Modifier = Modifier) {
     LaunchedEffect(Unit) {
         while (true) {
-            withFrameNanos {        // use the time if difference between frames is needed
+            withFrameNanos {   // use the time if difference between frames is needed
                 simulation.update()
             }
         }

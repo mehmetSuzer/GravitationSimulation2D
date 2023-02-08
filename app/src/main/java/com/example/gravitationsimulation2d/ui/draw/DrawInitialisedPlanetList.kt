@@ -34,9 +34,7 @@ fun DrawInitialisedPlanetList(
     informUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var state by rememberSaveable {
-        mutableStateOf(false)
-    }
+    var state by rememberSaveable { mutableStateOf(false) }
     LazyRow(
         modifier = modifier
             .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
@@ -90,6 +88,7 @@ fun DrawInitialisedPlanetImage(
             )
             .background(backgroundColor)
             .clickable { onChange() }
-        else modifier.clickable { onChange() }
+        else
+            modifier.clickable { onChange() }
     )
 }

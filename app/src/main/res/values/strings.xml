@@ -26,4 +26,7 @@
     <string name="title">Title</string>
     <string name="simulation_speed">Simulation Speed</string>
     <string name="update">Update</string>
+    <string name="simulation_scale">Simulation Scale</string>
+    <string name="simulation_scale_in_m_per_dp">Simulation Scale in m/dp</string>
+    <string name="earth_years_per_simulation_seconds">Earth Years Per Simulation Seconds</string>
 </resources>
