@@ -1,11 +1,9 @@
 package com.example.gravitationsimulation2d.ui.draw
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -27,6 +25,7 @@ import com.example.gravitationsimulation2d.mp
 
 @Composable
 fun AppTopBarInitScreen(
+    goToAstronomyPictures: () -> Unit,
     changeSimulationScale: () -> Unit,
     changeSimulationSpeed: () -> Unit,
     handleAudio: () -> Unit,
@@ -40,14 +39,15 @@ fun AppTopBarInitScreen(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .height(48.dp),
+            .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            modifier = Modifier.size(48.dp),
             painter = painterResource(id = R.drawable.app_logo),
-            contentDescription = null
+            contentDescription = null,
+            modifier = Modifier
+                .size(48.dp)
+                .clickable { goToAstronomyPictures() }
         )
         Spacer(modifier = Modifier.weight(1f))
         IconButton(onClick = { changeSimulationScale() }) {
@@ -210,5 +210,59 @@ fun AppTopBarRecordsScreen(
             style = MaterialTheme.typography.h4
         )
         Spacer(modifier = Modifier.weight(0.6f))
+    }
+}
+
+@Composable
+fun AppTopBarAstronomyPicture(
+    date: String,
+    openApiPopUp: () -> Unit,
+    goBack: () -> Unit,
+    onSearchClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val dateState = rememberSaveable { mutableStateOf(date) }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = { goBack() }) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = stringResource(id = R.string.back_to_initialisation_button),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        IconButton(onClick = { openApiPopUp() }) {
+            Icon(
+                imageVector = Icons.Filled.Key,
+                contentDescription = stringResource(R.string.set_the_nasa_api_key),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        OutlinedTextField(
+            value = dateState.value,
+            onValueChange = { newDate: String -> dateState.value = newDate},
+            singleLine = true,
+            modifier = Modifier.width(108.dp),
+            label = {
+                Text(
+                    text = "YYYY-MM-DD",
+                    color = MaterialTheme.colors.onSecondary,
+                    style = MaterialTheme.typography.h1
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        )
+        IconButton(onClick = { onSearchClick(dateState.value) }) {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = stringResource(R.string.search_the_astronomy_picture_of_the_day),
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }

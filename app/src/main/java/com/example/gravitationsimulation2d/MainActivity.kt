@@ -12,8 +12,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.gravitationsimulation2d.data.*
 import com.example.gravitationsimulation2d.func.*
@@ -34,10 +36,17 @@ import kotlin.math.pow
 TODO LIST
 when the screen is rotated, planets disappear
 colors of the app bar and the status bar must be same
+
+write API Key to a file
+implement a api key pop up
+make the api key to a part of the NasaApi
+write a function which checks whether the input date is valid or not
+use lazyColumn instead of Column in DrawNasaCard
+make the fields of NasaDto nullable and check whether they are null or not while printing
  */
 
 enum class Screen {
-    Init, Simulation, Records
+    Init, Simulation, Records, AstronomyPicture
 }
 
 enum class PopUp {
@@ -51,9 +60,11 @@ var audioWasPlaying = false
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val viewModel: HomeViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val homeViewModel: HomeViewModel by viewModels()
+        viewModel.setCurrentDate()
 
         audioWasPlaying = false
         mp = MediaPlayer.create(this, R.raw.interstellar_main_theme)
@@ -65,7 +76,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             GravitationSimulation2DTheme {
                 GravitationSimulation2DApp(
-                    homeViewModel = homeViewModel
+                    viewModel = viewModel
                 )
             }
         }
@@ -87,8 +98,8 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun GravitationSimulation2DApp(homeViewModel: HomeViewModelAbstract) {
-    val recordListState = homeViewModel.simulationRecordFlow.collectAsState(initial = listOf())
+fun GravitationSimulation2DApp(viewModel: HomeViewModelAbstract) {
+    val recordListState = viewModel.simulationRecordFlow.collectAsState(initial = listOf())
     var currentScreen by rememberSaveable { mutableStateOf(Screen.Init) }
     val planets = remember { mutableListOf<Planet>().toMutableStateList() }
     var selectedPlanetChange by rememberSaveable { mutableStateOf(false) }
@@ -99,6 +110,7 @@ fun GravitationSimulation2DApp(homeViewModel: HomeViewModelAbstract) {
         Scaffold(
             topBar = {
                 AppTopBarInitScreen(
+                    { currentScreen = Screen.AstronomyPicture },                // go to "Astronomy Picture of the Day" Page
                     { popUpState = PopUp.Scale },                               // change scale of the simulation
                     { popUpState = PopUp.Speed },                               // change speed of the simulation
                     {
@@ -159,7 +171,7 @@ fun GravitationSimulation2DApp(homeViewModel: HomeViewModelAbstract) {
                                     speed = log10(simulationSpeed),
                                     scale = log10(simulationScale)
                                 )
-                                homeViewModel.addRecord(record)
+                                viewModel.addRecord(record)
                                 recordsRef.child(firebaseId(record)).setValue(record)
                                 popUpState = PopUp.Close
                             }
@@ -208,17 +220,14 @@ fun GravitationSimulation2DApp(homeViewModel: HomeViewModelAbstract) {
     else if (currentScreen == Screen.Records) {
         Scaffold(
             topBar = {
-                AppTopBarRecordsScreen(backToInitialisation = {
-                    currentScreen = Screen.Init
-                    }
-                )
+                AppTopBarRecordsScreen(backToInitialisation = { currentScreen = Screen.Init })
             }
         ) {
             SimulationRecordsList(
                 recordListState.value,
                 { record ->
                     recordsRef.child(firebaseId(record)).removeValue()                      // delete record
-                    homeViewModel.deleteRecord(record)
+                    viewModel.deleteRecord(record)
                 },
                 { record ->
                     val planetList = convertPlanetListStringToPlanets(record.planetList)    // load the simulation
@@ -233,6 +242,40 @@ fun GravitationSimulation2DApp(homeViewModel: HomeViewModelAbstract) {
             )
         }
     }
+    else if (currentScreen == Screen.AstronomyPicture) {
+        Scaffold(
+            topBar = {
+                AppTopBarAstronomyPicture(
+                    date = viewModel.state.date,
+                    { /* Open a Pop Up which takes an api from the user */ },
+                    goBack = { currentScreen = Screen.Init },
+                    onSearchClick = { newDate -> viewModel.loadNasaDto(newDate) }
+                )
+            }
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                DrawNasaCard(
+                    nasaDto = viewModel.state.nasaDto,
+                    modifier = Modifier.fillMaxSize()
+                )
+                if (viewModel.state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                viewModel.state.error?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Preview
@@ -240,11 +283,17 @@ fun GravitationSimulation2DApp(homeViewModel: HomeViewModelAbstract) {
 fun AppPreview() {
     GravitationSimulation2DTheme(darkTheme = isSystemInDarkTheme()) {
         GravitationSimulation2DApp(
-            homeViewModel = object : HomeViewModelAbstract {
-                override val simulationRecordFlow: Flow<List<SimulationRecord>> get() = flowOf(listOf())
+            viewModel = object : HomeViewModelAbstract {
+                override val simulationRecordFlow: Flow<List<SimulationRecord>>
+                    get() = flowOf(listOf())
+                override var state: NasaState
+                    get() = NasaState()
+                    set(value) {}
                 override fun addRecord(record: SimulationRecord) {}
                 override fun updateRecord(record: SimulationRecord) {}
                 override fun deleteRecord(record: SimulationRecord) {}
+                override fun setCurrentDate() {}
+                override fun loadNasaDto(date: String) {}
             }
         )
     }
