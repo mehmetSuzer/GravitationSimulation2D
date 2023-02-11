@@ -2,7 +2,9 @@ package com.example.gravitationsimulation2d.ui.draw
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -29,36 +31,46 @@ fun DrawNasaCard(
             .padding(8.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             if (nasaDto != null) {
-                Text(
-                    text = nasaDto.title,
-                    color = MaterialTheme.colors.onSecondary,
-                    style = MaterialTheme.typography.button,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                if (nasaDto.title != null) {
+                    Text(
+                        text = nasaDto.title,
+                        color = MaterialTheme.colors.onSecondary,
+                        style = MaterialTheme.typography.button,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
-                Image(
-                    painter = rememberAsyncImagePainter(nasaDto.url),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(280.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
+                if (nasaDto.url != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(nasaDto.url),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(280.dp)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = nasaDto.explanation,
-                    color = MaterialTheme.colors.onSecondary,
-                    style = MaterialTheme.typography.body1
-                )
+                if (nasaDto.explanation != null) {
+                    Text(
+                        text = nasaDto.explanation,
+                        color = MaterialTheme.colors.onSecondary,
+                        style = MaterialTheme.typography.body1
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = nasaDto.copyright,
-                    color = MaterialTheme.colors.onSecondary,
-                    style = MaterialTheme.typography.h2,
-                    modifier = Modifier.align(Alignment.End)
-                )
+                if (nasaDto.copyright != null) {
+                    Text(
+                        text = nasaDto.copyright,
+                        color = MaterialTheme.colors.onSecondary,
+                        style = MaterialTheme.typography.h2,
+                        modifier = Modifier.align(Alignment.End)
+                    )
+                }
             } else {
                 Text(
                     text = stringResource(R.string.astronomy_picture_msg),

@@ -4,13 +4,13 @@ import com.squareup.moshi.Json
 
 data class NasaDto(
     @field:Json(name = "copyright")
-    val copyright: String,
+    val copyright: String?,
     @field:Json(name = "date")
-    val date: String,
+    val date: String?,
     @field:Json(name = "explanation")
-    val explanation: String,
+    val explanation: String?,
     @field:Json(name = "title")
-    val title: String,
+    val title: String?,
     @field:Json(name = "url")
-    val url: String
+    val url: String?
 )

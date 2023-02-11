@@ -1,6 +1,7 @@
 package com.example.gravitationsimulation2d
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -28,21 +29,14 @@ import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import java.io.File
 import kotlin.math.log10
 import kotlin.math.pow
 
 /*
-
 TODO LIST
 when the screen is rotated, planets disappear
 colors of the app bar and the status bar must be same
-
-write API Key to a file
-implement a api key pop up
-make the api key to a part of the NasaApi
-write a function which checks whether the input date is valid or not
-use lazyColumn instead of Column in DrawNasaCard
-make the fields of NasaDto nullable and check whether they are null or not while printing
  */
 
 enum class Screen {
@@ -50,13 +44,16 @@ enum class Screen {
 }
 
 enum class PopUp {
-    Save, Speed, Scale, Close
+    Save, Speed, Scale, Close, ApiKey
 }
+
+const val API_KEY_FILE_NAME = "api_key.txt"
 
 val recordsRef = FirebaseDatabase.getInstance().getReference("records")
 val data_source: Datasource = Datasource()
 var mp: MediaPlayer? = null
 var audioWasPlaying = false
+var apiKey = "DEMO_KEY"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -73,10 +70,15 @@ class MainActivity : ComponentActivity() {
             mp!!.start()
         }
 
+        if (API_KEY_FILE_NAME in this.fileList()) {
+            apiKey = this.openFileInput(API_KEY_FILE_NAME).bufferedReader().readText()
+        }
+
         setContent {
             GravitationSimulation2DTheme {
                 GravitationSimulation2DApp(
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    context = this
                 )
             }
         }
@@ -98,7 +100,7 @@ class MainActivity : ComponentActivity() {
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun GravitationSimulation2DApp(viewModel: HomeViewModelAbstract) {
+fun GravitationSimulation2DApp(viewModel: HomeViewModelAbstract, context: Context) {
     val recordListState = viewModel.simulationRecordFlow.collectAsState(initial = listOf())
     var currentScreen by rememberSaveable { mutableStateOf(Screen.Init) }
     val planets = remember { mutableListOf<Planet>().toMutableStateList() }
@@ -247,9 +249,14 @@ fun GravitationSimulation2DApp(viewModel: HomeViewModelAbstract) {
             topBar = {
                 AppTopBarAstronomyPicture(
                     date = viewModel.state.date,
-                    { /* Open a Pop Up which takes an api from the user */ },
-                    goBack = { currentScreen = Screen.Init },
-                    onSearchClick = { newDate -> viewModel.loadNasaDto(newDate) }
+                    { popUpState = PopUp.ApiKey },              // set the api key
+                    goBack = { currentScreen = Screen.Init },   // go back to init screen
+                    onSearchClick = { date ->
+                        val stripedDate = validDate(date)       // search the astronomy picture of the day
+                        if (stripedDate != null) {
+                            viewModel.loadNasaDto(apiKey, stripedDate)
+                        }
+                    }
                 )
             }
         ) {
@@ -274,6 +281,21 @@ fun GravitationSimulation2DApp(viewModel: HomeViewModelAbstract) {
                     )
                 }
             }
+            if (popUpState == PopUp.ApiKey) {
+                DrawApiKeyPopUp(
+                    updateApiKey = { newApiKey ->
+                        if (API_KEY_FILE_NAME !in context.fileList()) {
+                            File(context.filesDir, API_KEY_FILE_NAME)
+                        }
+                        context.openFileOutput(API_KEY_FILE_NAME, Context.MODE_PRIVATE).use {
+                            it.write(newApiKey.toByteArray())
+                        }
+                        apiKey = context.openFileInput(API_KEY_FILE_NAME).bufferedReader().readText()
+                        popUpState = PopUp.Close },
+                    cancelUpdating = { popUpState = PopUp.Close },
+                    currentApiKey = apiKey
+                )
+            }
         }
     }
 }
@@ -293,8 +315,9 @@ fun AppPreview() {
                 override fun updateRecord(record: SimulationRecord) {}
                 override fun deleteRecord(record: SimulationRecord) {}
                 override fun setCurrentDate() {}
-                override fun loadNasaDto(date: String) {}
-            }
+                override fun loadNasaDto(api_key: String, date: String) {}
+            },
+            context = ComponentActivity()
         )
     }
 }

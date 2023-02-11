@@ -9,10 +9,10 @@ import javax.inject.Inject
 class NasaRepositoryImpl @Inject constructor(
     private val api: NasaApi
 ): NasaRepository {
-    override suspend fun getNasaData(date: String): Resource<NasaDto> {
+    override suspend fun getNasaData(api_key: String, date: String): Resource<NasaDto> {
         return try {
             Resource.Success(
-                data = api.getPictureOfTheDay(date)
+                data = api.getPictureOfTheDay(api_key, date)
             )
         } catch (e: Exception) {
             e.printStackTrace()

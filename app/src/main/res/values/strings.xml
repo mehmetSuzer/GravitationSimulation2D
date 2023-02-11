@@ -32,4 +32,5 @@
     <string name="search_the_astronomy_picture_of_the_day">Search the astronomy picture of the day</string>
     <string name="astronomy_picture_msg">Enter a date to get the astronomy picture of the day</string>
     <string name="set_the_nasa_api_key">Set the Nasa Api Key</string>
+    <string name="api_key">API KEY</string>
 </resources>

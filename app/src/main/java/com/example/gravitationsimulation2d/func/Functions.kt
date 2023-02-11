@@ -125,3 +125,22 @@ fun firebaseId(record: SimulationRecord): String {
     val title = record.title
     return "{$title}_$date"
 }
+
+// Removes whitespaces from the beginning and the end of the date
+// If the date is in the format of YYYY-MM-DD, returns the stripped date
+// Otherwise, returns null
+fun validDate(date: String): String? {
+    if (date.length < 10) // check whether the date contains at least 10 chars
+        return null
+
+    val strippedDate = strip(date)
+    val year = strippedDate.slice(0..3).toIntOrNull()
+    val month = strippedDate.slice(5..6).toIntOrNull()
+    val day = strippedDate.slice(8..9).toIntOrNull()
+
+    return if (year != null && month != null && day != null && strippedDate[4] == '-' && strippedDate[7] == '-') {
+        strippedDate
+    } else {
+        null
+    }
+}

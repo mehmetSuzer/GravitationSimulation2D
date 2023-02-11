@@ -26,7 +26,7 @@ interface HomeViewModelAbstract {
     fun updateRecord(record: SimulationRecord)
     fun deleteRecord(record: SimulationRecord)
     fun setCurrentDate()
-    fun loadNasaDto(date: String)
+    fun loadNasaDto(api_key: String, date: String)
 }
 
 @HiltViewModel
@@ -71,13 +71,13 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    override fun loadNasaDto(date: String) {
+    override fun loadNasaDto(api_key: String, date: String) {
         viewModelScope.launch {
             state = state.copy(
                 isLoading = true,
                 error = null
             )
-            when (val result = nasaRepository.getNasaData(date)) {
+            when (val result = nasaRepository.getNasaData(api_key, date)) {
                 is Resource.Success -> {
                     state = state.copy(
                         date = date,
