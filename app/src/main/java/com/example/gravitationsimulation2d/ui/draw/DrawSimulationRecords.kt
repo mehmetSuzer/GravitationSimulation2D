@@ -31,7 +31,7 @@ fun SimulationRecordsList(
 ) {
     LazyColumn(modifier = modifier.background(MaterialTheme.colors.background)
     ) {
-        items(records) {record ->
+        items(records.reversed()) {record ->
             SimulationRecordUnit(record, { deleteRecord(record) }, { loadSimulation(record) })
         }
     }
@@ -114,3 +114,4 @@ fun SimulationRecordUnit(
         }
     }
 }
+

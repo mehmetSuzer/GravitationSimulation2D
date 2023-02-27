@@ -2,6 +2,7 @@ package com.example.gravitationsimulation2d
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -35,7 +36,6 @@ import kotlin.math.pow
 
 /*
 TODO LIST
-when the screen is rotated, planets disappear
 colors of the app bar and the status bar must be same
  */
 
@@ -61,6 +61,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         viewModel.setCurrentDate()
 
         audioWasPlaying = false
