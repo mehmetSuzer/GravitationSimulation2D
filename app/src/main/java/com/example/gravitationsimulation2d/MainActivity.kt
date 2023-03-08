@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
         viewModel.setCurrentDate()
 
         audioWasPlaying = false
-        mp = MediaPlayer.create(this, R.raw.interstellar_main_theme)
+        mp = MediaPlayer.create(this, R.raw.music)
         if (mp != null) {
             mp!!.isLooping = true
             mp!!.start()
